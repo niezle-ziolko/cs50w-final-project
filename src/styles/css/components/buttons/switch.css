@@ -1,0 +1,94 @@
+.switch {
+  display: inline-block;
+  height: var(--primary-space);
+  width: var(--secondary-space);
+  font-size: var(--font-size-p);
+  position: var(--relative-position);
+}
+
+.switch input {
+  width: var(--null-space);
+  height: var(--null-space);
+  opacity: var(--null-space);
+}
+
+.slider {
+  transition: .15s;
+  box-sizing: border-box;
+  top: var(--null-space);
+  left: var(--null-space);
+  right: var(--null-space);
+  bottom: var(--null-space);
+  cursor: var(--pointer-cursor);
+  border: var(--primary-border);
+  position: var(--absolute-position);
+  border-radius: var(--primary-space);
+  background-color: var(--third-color);
+}
+
+.slider:before {
+  left: -2px;
+  content: "";
+  bottom: -2px;
+  transition: .15s;
+  box-sizing: border-box;
+  width: var(--primary-space);
+  height: var(--primary-space);
+  transform: translateY(-0.2em);
+  border: var(--primary-border);
+  border-radius: var(--full-space);
+  position: var(--absolute-position);
+  background-color: var(--third-color);
+  box-shadow: 0 0.2em 0 var(--primary-color);
+}
+
+input:checked + .slider {
+  background-color: var(--third-color);
+}
+
+input:focus-visible + .slider {
+  box-shadow: 0 0 0 2px var(--third-color);
+}
+
+input:hover + .slider:before {
+  transform: translateY(-0.3em);
+  box-shadow: 0 0.3em 0 var(--primary-color);
+}
+
+input:checked + .slider:before {
+  transform: translateX(calc(var(--secondary-space) - var(--primary-space))) translateY(-0.2em);
+}
+
+input:hover:checked + .slider:before {
+  box-shadow: 0 0.3em 0 var(--primary-color);
+  transform: translateX(calc(var(--secondary-space) - var(--primary-space))) translateY(-0.3em);
+}
+
+.menu .container {
+  gap: 50px;
+  display: var(--flex-display);
+  align-items: var(--center-align);
+}
+
+.menu .list {
+  gap: 50px;
+  padding: 0px;
+  font-size: 20px;
+  display: var(--flex-display);
+  align-items: var(--center-align);
+  font-family: var(--primary-font-family);
+}
+
+.menu .item {
+  display: var(--flex-display);
+}
+
+.menu .item:hover {
+  font-weight: bold;
+  transition: all 0.3s;
+  cursor: var(--pointer-cursor);
+}
+
+.logout-button {
+  padding: 8px var(--quarter-space);
+}

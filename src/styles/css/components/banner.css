@@ -1,0 +1,29 @@
+.banner .box {
+  display: flex;
+  gap: 35px;
+  align-items: center;
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+.banner .content {
+  align-content: center;
+}
+
+.banner .title {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.banner .text {
+  font-size: 1.3rem;
+}
+
+.banner .title-align {
+  text-align: end;
+}
+
+.banner .text-align {
+  text-align: end;
+  font-size: 1.3rem;
+}
