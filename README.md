@@ -6,7 +6,7 @@ Final project for CS50's Web Programming with Python and JavaScript course. This
 
 **Demo site:** [https://cs50-final-project.niezleziolko.app](https://cs50-final.niezleziolko.app)
 
-**Video walkthrough:** [https://youtu.be/-lCgQ6-MzIw](https://youtu.be/-lCgQ6-MzIw)
+**A short video where I go through the required specifications of the project:** [https://youtu.be/-lCgQ6-MzIw](https://youtu.be/-lCgQ6-MzIw)
 
 ---
 
