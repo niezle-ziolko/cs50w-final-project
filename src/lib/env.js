@@ -4,7 +4,7 @@ import path from 'path';
 
 export const loadEnv = () => {
   const projectDir = process.cwd();
-  const wranglerJsonPath = path.join(projectDir, 'wrangler.json');
+  const wranglerJsonPath = path.join(projectDir, 'wrangler.jsonc');
 
   if (fs.existsSync(wranglerJsonPath)) {
     const wranglerConfig = JSON.parse(fs.readFileSync(wranglerJsonPath, 'utf-8'));
