@@ -1,21 +1,21 @@
-'use client';
-import { useState } from 'react';
-import Script from 'next/script';
-import { useRouter } from 'next/navigation';
-import { useAuth } from 'context/auth-context';
+"use client";
+import { useState } from "react";
+import Script from "next/script";
+import { useRouter } from "next/navigation";
+import { useAuth } from "context/auth-context";
 
-import Loader from 'components/loader';
+import Loader from "components/loader";
 
 export default function SignInForm() {
   // Router for navigation after successful login
   const router = useRouter();
   // User context to update the user data after login
   const { updateUser } = useAuth();
-  const [error, setError] = useState(''); // State to handle error messages
+  const [error, setError] = useState(""); // State to handle error messages
   const [loading, setLoading] = useState(false); // State to manage the loading state of the form
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    username: "",
+    password: ""
   }); // Form data state to handle username and password inputs
 
   // Handle changes in the form inputs (username and password)
@@ -26,14 +26,14 @@ export default function SignInForm() {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
-    setError(''); // Clear previous error messages
+    setError(""); // Clear previous error messages
 
     const formState = new FormData(e.target); // Collect form data
-    const turnstileRes = formState.get('cf-turnstile-response'); // Get Turnstile verification response
+    const turnstileRes = formState.get("cf-turnstile-response"); // Get Turnstile verification response
 
     // Validate Turnstile verification (anti-bot mechanism)
-    if (!turnstileRes || turnstileRes === 'error') {
-      setError('Turnstile verification failed.');
+    if (!turnstileRes || turnstileRes === "error") {
+      setError("Turnstile verification failed.");
       return;
     };
 
@@ -41,18 +41,18 @@ export default function SignInForm() {
       setLoading(true); // Set loading state to true while processing the request
 
       // Re-check Turnstile verification before proceeding with authentication
-      if (!turnstileRes || turnstileRes === 'error') {
-        setError('Turnstile verification failed.');
+      if (!turnstileRes || turnstileRes === "error") {
+        setError("Turnstile verification failed.");
         setLoading(false); // Reset loading state in case of failure
         return;
       };
 
       // Send the Turnstile response along with username and password for validation
-      const response = await fetch('/api/auth/challenge', {
-        method: 'POST',
+      const response = await fetch("/api/auth/challenge", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_CHALLENGE_AUTH}`
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_CHALLENGE_AUTH}`
         },
         body: JSON.stringify({
           token: turnstileRes, // Turnstile token
@@ -60,26 +60,26 @@ export default function SignInForm() {
         })
       });
 
-      console.log('Challenge response:', response); // Log the challenge response
+      console.log("Challenge response:", response); // Log the challenge response
 
       // If the challenge is successful, proceed to user authentication
       if (response.ok) {
         setLoading(true); // Keep loading state true while requesting user data
 
         // Encode credentials in base64 format for secure transmission
-        const credentials = Buffer.from(`${formData.username}:${formData.password}`).toString('base64');
+        const credentials = Buffer.from(`${formData.username}:${formData.password}`).toString("base64");
         
         // Fetch user data using the encoded credentials
-        const res = await fetch('/api/auth/user', {
-          method: 'GET',
+        const res = await fetch("/api/auth/user", {
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_CLIENT_AUTH}`,
-            'Credentials': credentials // Include the encoded credentials in the request
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${process.env.NEXT_PUBLIC_CLIENT_AUTH}`,
+            "Credentials": credentials // Include the encoded credentials in the request
           }
         });
 
-        console.log('User response:', res); // Log the user data response
+        console.log("User response:", res); // Log the user data response
 
         // If the response is not OK, set an error and reset loading state
         if (!res.ok) {
@@ -92,38 +92,38 @@ export default function SignInForm() {
         // If successful, update the user data in the context and redirect to the user account page
         const data = await res.json();
         updateUser(data);
-        router.push('/auth/my-account'); // Navigate to the user's account page
+        router.push("/auth/my-account"); // Navigate to the user"s account page
         setLoading(false); // Reset loading state after successful login
       };
     } catch (error) {
       // Handle unexpected errors and display an error message
-      setError('An unexpected error occurred.');
-      console.error('Login error:', error);
+      setError("An unexpected error occurred.");
+      console.error("Login error:", error);
       setLoading(false);
     };
   };
 
-  // Turnstile site key for Cloudflare's bot protection
+  // Turnstile site key for Cloudflare"s bot protection
   const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_SITE_KEY;
 
   return (
     <div>
       {/* Load the Turnstile script from Cloudflare to handle bot verification */}
-      <Script src='https://challenges.cloudflare.com/turnstile/v0/api.js' />
-      <div className='form login'>
-        <form className='form' onSubmit={handleSubmit}>
-          <p className='heading'>Sign in</p>
+      <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" />
+      <div className="form login">
+        <form className="form" onSubmit={handleSubmit}>
+          <p className="heading">Sign in</p>
           {/* Username input field */}
-          <input className='input' name='username' placeholder='Username' type='text' value={formData.username} onChange={handleChange} required />
+          <input className="input" name="username" placeholder="Username" type="text" value={formData.username} onChange={handleChange} required />
           {/* Password input field */}
-          <input className='input' name='password' placeholder='Password' type='password' value={formData.password} onChange={handleChange} required />
+          <input className="input" name="password" placeholder="Password" type="password" value={formData.password} onChange={handleChange} required />
           {/* Turnstile widget for bot verification */}
-          <div className='cf-turnstile' data-sitekey={TURNSTILE_SITE_KEY} data-callback='javascriptCallback' data-theme='dark' />
+          <div className="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-callback="javascriptCallback" data-theme="dark" />
           {/* Display error message if any */}
-          {error && <p className='error-message'>{error}</p>}
+          {error && <p className="error-message">{error}</p>}
           {/* Submit button, shows loading indicator while processing */}
-          <button className='button' type='submit' disabled={loading}>
-            {loading ? <Loader /> : 'Submit'}
+          <button className="button" type="submit" disabled={loading}>
+            {loading ? <Loader /> : "Submit"}
           </button>
         </form>
       </div>

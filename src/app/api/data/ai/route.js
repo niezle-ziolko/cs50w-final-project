@@ -1,7 +1,7 @@
-import { getRequestContext } from '@cloudflare/next-on-pages';
-import { bearerHeaders } from 'utils/headers';
+import { getRequestContext } from "@cloudflare/next-on-pages";
+import { bearerHeaders } from "utils/headers";
 
-import * as googleTTS from 'google-tts-api';
+import * as googleTTS from "google-tts-api";
 
 export async function POST(request) {
   try {
@@ -18,34 +18,34 @@ export async function POST(request) {
       // Parse form data from the request
       formData = await request.formData();
     } catch {
-      return new Response(JSON.stringify({ error: 'Invalid form data' }), {
+      return new Response(JSON.stringify({ error: "Invalid form data" }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       });
     };
 
     // Extract required fields from form data
-    const title = formData.get('title');
-    const description = formData.get('description');
-    const author = formData.get('username');
-    const picture = formData.get('image');
+    const title = formData.get("title");
+    const description = formData.get("description");
+    const author = formData.get("username");
+    const picture = formData.get("image");
 
     // Ensure all required fields are provided
     if (!title || !description || !author || !picture) {
-      return new Response(JSON.stringify({ error: 'All fields are required.' }), {
+      return new Response(JSON.stringify({ error: "All fields are required." }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       });
     };
 
     const db = env.D1;
 
     // Check if a book with the same title already exists
-    const existingBook = await db.prepare('SELECT id FROM books WHERE title = ?').bind(title).first();
+    const existingBook = await db.prepare("SELECT id FROM books WHERE title = ?").bind(title).first();
     if (existingBook) {
-      return new Response(JSON.stringify({ error: 'Title book already exists' }), {
+      return new Response(JSON.stringify({ error: "Title book already exists" }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       });
     };
 
@@ -61,13 +61,13 @@ export async function POST(request) {
 
     // Extract and validate uploaded text files
     const files = [...formData.entries()]
-      .filter(([key, file]) => file instanceof File && file.name.endsWith('.txt'))
+      .filter(([key, file]) => file instanceof File && file.name.endsWith(".txt"))
       .map(([key, file]) => file);
 
     if (files.length === 0) {
-      return new Response(JSON.stringify({ error: 'No .txt files uploaded.' }), {
+      return new Response(JSON.stringify({ error: "No .txt files uploaded." }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       });
     };
 
@@ -80,10 +80,10 @@ export async function POST(request) {
       
       // Convert text to speech using Google TTS
       const audioData = googleTTS.getAllAudioUrls(text, {
-        lang: 'en',
+        lang: "en",
         slow: false,
-        host: 'https://translate.google.com',
-        splitPunct: '`'
+        host: "https://translate.google.com",
+        splitPunct: "`"
       });
 
       // Fetch audio buffers for the generated audio URLs
@@ -103,31 +103,31 @@ export async function POST(request) {
       audioUrls.push(fileUrl);
     };
 
-    const fileUrlsString = audioUrls.join(',');
+    const fileUrlsString = audioUrls.join(",");
 
     // Insert book details into the database
     await db.prepare(
-      'INSERT INTO books (id, title, description, author, picture, file, date) VALUES (?, ?, ?, ?, ?, ?, ?)'
+      "INSERT INTO books (id, title, description, author, picture, file, date) VALUES (?, ?, ?, ?, ?, ?, ?)"
     ).bind(bookId, title, description, author, imageUrl, fileUrlsString, dateCreated).run();
 
     // Retrieve user information from the database
     const userResult = await db.prepare(
-      'SELECT * FROM users WHERE username = ?'
+      "SELECT * FROM users WHERE username = ?"
     ).bind(author).first();
 
     if (!userResult) {
-      return new Response(JSON.stringify({ error: 'User not found' }), {
+      return new Response(JSON.stringify({ error: "User not found" }), {
         status: 404,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       });
     };
 
-    // Update the user's created books list
-    const existingCreated = userResult.created || '';
+    // Update the user"s created books list
+    const existingCreated = userResult.created || "";
     const updatedCreated = existingCreated ? `${existingCreated}, ${bookId}` : bookId;
 
     await db.prepare(
-      'UPDATE users SET created = ? WHERE id = ?'
+      "UPDATE users SET created = ? WHERE id = ?"
     ).bind(updatedCreated, userResult.id).run();
 
     // Prepare user data for response
@@ -144,15 +144,15 @@ export async function POST(request) {
 
     return new Response(JSON.stringify(userData), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" }
     });
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" }
     });
   };
 };
 
 // Define the runtime environment as Edge Workers
-export const runtime = 'edge';
+export const runtime = "edge";

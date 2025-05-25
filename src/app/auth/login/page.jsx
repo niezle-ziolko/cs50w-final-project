@@ -1,7 +1,7 @@
-'use client';
-import SignInForm from 'components/forms/sign-in';
+"use client";
+import SignInForm from "components/forms/sign-in";
 
-import 'styles/css/components/forms.css';
+import "styles/css/components/forms.css";
 
 export default function Login() {
   return <SignInForm />;

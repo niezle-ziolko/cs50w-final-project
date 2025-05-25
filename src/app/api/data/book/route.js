@@ -1,5 +1,5 @@
-import { getRequestContext } from '@cloudflare/next-on-pages';
-import { bearerHeaders } from 'utils/headers';
+import { getRequestContext } from "@cloudflare/next-on-pages";
+import { bearerHeaders } from "utils/headers";
 
 export async function GET(request) {
   try {
@@ -13,7 +13,7 @@ export async function GET(request) {
 
     // Parse the URL and get the book ID from query parameters
     const urlSearchParams = new URL(request.url);
-    const id = urlSearchParams.searchParams.get('id');
+    const id = urlSearchParams.searchParams.get("id");
 
     // Reference to the database (D1)
     const db = env.D1;
@@ -22,32 +22,32 @@ export async function GET(request) {
 
     // If no ID is provided, return all books
     if (!id) {
-      result = await db.prepare('SELECT * FROM books').all();
+      result = await db.prepare("SELECT * FROM books").all();
 
       // If no books are found, return a 404 error
       if (result.length === 0) {
-        return new Response(JSON.stringify({ error: 'No books found' }), {
+        return new Response(JSON.stringify({ error: "No books found" }), {
           status: 404,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { "Content-Type": "application/json" }
         });
       };
 
       // Return list of books as JSON
       return new Response(JSON.stringify(result.results), {
         status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       });
     } else {
       // If an ID is provided, return specific book data
       result = await db.prepare(
-        `SELECT * FROM books WHERE id = '${id}'`
+        `SELECT * FROM books WHERE id = "${id}"`
       ).first();
 
       // If no book is found for the given ID, return a 404 error
       if (!result) {
-        return new Response(JSON.stringify({ error: 'Book not found' }), {
+        return new Response(JSON.stringify({ error: "Book not found" }), {
           status: 404,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { "Content-Type": "application/json" }
         });
       };
 
@@ -63,14 +63,14 @@ export async function GET(request) {
 
       return new Response(JSON.stringify(bookData), {
         status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       });
     };
   } catch (error) {
     // Return an error message if there is an exception
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" }
     });
   };
 };
@@ -89,23 +89,23 @@ export async function POST(request) {
     formData = await request.formData();
   } catch {
     // If form data is invalid, return a 400 error
-    return new Response(JSON.stringify({ error: 'Invalid form data' }), {
+    return new Response(JSON.stringify({ error: "Invalid form data" }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" }
     });
   };
 
   // Get book details from the form data
-  const title = formData.get('title');
-  const description = formData.get('description');
-  const author = formData.get('username');
-  const picture = formData.get('image');
+  const title = formData.get("title");
+  const description = formData.get("description");
+  const author = formData.get("username");
+  const picture = formData.get("image");
 
   // Ensure all required fields are provided
   if (!title || !description || !author || !picture) {
-    return new Response(JSON.stringify({ error: 'All fields are required.' }), {
+    return new Response(JSON.stringify({ error: "All fields are required." }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" }
     });
   };
 
@@ -115,14 +115,14 @@ export async function POST(request) {
   try {
     // Check if a book with the same title already exists
     const existingBook = await db.prepare(
-      'SELECT id FROM books WHERE title = ?'
+      "SELECT id FROM books WHERE title = ?"
     ).bind(title).first();
 
     // If the book already exists, return a 400 error
     if (existingBook) {
-      return new Response(JSON.stringify({ error: 'Title book already exists' }), {
+      return new Response(JSON.stringify({ error: "Title book already exists" }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       });
     };
 
@@ -130,7 +130,7 @@ export async function POST(request) {
     const bookId = crypto.randomUUID();
     const dateCreated = new Date().toISOString();
 
-    // Upload the book's picture to R2 storage
+    // Upload the book"s picture to R2 storage
     const imageName = `${bookId}.webp`;
     const imageKey = `final-project/book-picture/${imageName}`;
     await getRequestContext().env.R2.put(imageKey, picture);
@@ -138,7 +138,7 @@ export async function POST(request) {
 
     // Handle audio file uploads for the book
     const fileUrls = [];
-    const files = formData.getAll('audio');
+    const files = formData.getAll("audio");
     let fileCounter = 1;
 
     // Upload each audio file and store its URL
@@ -158,32 +158,32 @@ export async function POST(request) {
     };
 
     // Combine the file URLs into a string
-    const fileUrlsString = fileUrls.join(',');
+    const fileUrlsString = fileUrls.join(",");
 
     // Insert the new book data into the database
     await db.prepare(
-      'INSERT INTO books (id, title, description, author, picture, file, date) VALUES (?, ?, ?, ?, ?, ?, ?)'
+      "INSERT INTO books (id, title, description, author, picture, file, date) VALUES (?, ?, ?, ?, ?, ?, ?)"
     ).bind(bookId, title, description, author, imageUrl, fileUrlsString, dateCreated).run();
 
     // Get user details for the author of the book
     const userResult = await db.prepare(
-      'SELECT * FROM users WHERE username = ?'
+      "SELECT * FROM users WHERE username = ?"
     ).bind(author).first();
 
     // If the user is not found, return a 404 error
     if (!userResult) {
-      return new Response(JSON.stringify({ error: 'User not found' }), {
+      return new Response(JSON.stringify({ error: "User not found" }), {
         status: 404,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       });
     };
 
-    // Update the user's created books list
-    const existingCreated = userResult.created || '';
+    // Update the user"s created books list
+    const existingCreated = userResult.created || "";
     const updatedCreated = existingCreated ? `${existingCreated}, ${bookId}` : bookId;
 
     await db.prepare(
-      'UPDATE users SET created = ? WHERE id = ?'
+      "UPDATE users SET created = ? WHERE id = ?"
     ).bind(updatedCreated, userResult.id).run();
 
     // Prepare user data for response
@@ -201,16 +201,16 @@ export async function POST(request) {
     // Return user data as JSON
     return new Response(JSON.stringify(userData), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" }
     });
   } catch (error) {
     // Return an error message if there is an exception
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" }
     });
   };
 };
 
 // Set the runtime to edge for Cloudflare Workers
-export const runtime = 'edge';
+export const runtime = "edge";

@@ -1,7 +1,7 @@
-'use client';
-import { useAudio } from 'context/audio-context';
-import { useAuth } from 'context/auth-context';
-import { useState, useEffect } from 'react';
+"use client";
+import { useAudio } from "context/audio-context";
+import { useAuth } from "context/auth-context";
+import { useState, useEffect } from "react";
 
 export default function LikeButton({ externalBookId }) {
   // Retrieve internal book ID from the audio context and user data from the auth context
@@ -21,7 +21,7 @@ export default function LikeButton({ externalBookId }) {
     };
 
     // Split the liked books string into an array and check if the current bookId is liked
-    const likedBooks = user.liked.split(', ');
+    const likedBooks = user.liked.split(", ");
     setIsLiked(likedBooks.includes(bookId));
   }, [bookId, user?.liked]); // Re-run effect when bookId or liked books list changes
 
@@ -32,14 +32,14 @@ export default function LikeButton({ externalBookId }) {
 
     try {
       // Determine the method based on whether the book is liked or not
-      const method = isLiked ? 'DELETE' : 'POST';
+      const method = isLiked ? "DELETE" : "POST";
       
       // Send the like/unlike request to the server
-      const response = await fetch('/api/auth/like', {
+      const response = await fetch("/api/auth/like", {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_CLIENT_AUTH}`
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_CLIENT_AUTH}`
         },
         body: JSON.stringify({
           id: bookId,
@@ -59,16 +59,16 @@ export default function LikeButton({ externalBookId }) {
       
       // Toggle the liked state and log success message
       setIsLiked(!isLiked);
-      console.log(`Book ${isLiked ? 'unliked' : 'liked'} successfully`);
+      console.log(`Book ${isLiked ? "unliked" : "liked"} successfully`);
     } catch (error) {
       // Log any errors during the fetch operation
-      console.error('error:', error);
+      console.error("error:", error);
     };
   };
 
   return (
-    <div className='heart' onClick={handleLike}>
-      <i className='fa-regular fa-heart' style={{ transition: 'all .4s', fontWeight: isLiked ? 'bold' : 'normal' }} />
+    <div className="heart" onClick={handleLike}>
+      <i className="fa-regular fa-heart" style={{ transition: "all .4s", fontWeight: isLiked ? "bold" : "normal" }} />
     </div>
   );
 };

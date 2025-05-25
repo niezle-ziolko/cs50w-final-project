@@ -25,33 +25,6 @@ cs50-final-project/
 ├── src                           # Source files
 │   ├── lib                       # Folder with files that add additional features to the application
 │   │   └── env.js                # Script to load all environment variables in the application frontend
-│   ├── styles                    # Styles folder
-│   │   ├── css                   # Css folder
-│   │   │   ├── components
-│   │   │   │   ├── panel.css
-│   │   │   │   ├── banner.css
-│   │   │   │   ├── forms.css
-│   │   │   │   ├── placeholder.css
-│   │   │   │   ├── playing.css
-│   │   │   │   ├── player.css
-│   │   │   │   ├── loader.css
-│   │   │   │   ├── popups.css
-│   │   │   │   └── buttons
-│   │   │   │       └── switch.css
-│   │   │   ├── theme
-│   │   │   │   ├── theme.css
-│   │   │   │   └── not-found.css
-│   │   │   ├── header
-│   │   │   │   └── theme.css
-│   │   │   └── footer
-│   │   │       └── theme.css
-│   │   ├── icons                 # Icons folder
-│   │   │   ├── ai.js
-│   │   │   ├── logo.js
-│   │   │   └── github.js
-│   │   └── fonts                 # Fonts folder
-│   │       ├── proxima-nova.woff
-│   │       └── montserrat.woff
 ├── app                           # Main application folder
 │   ├── not-found.js              # Not found page
 │   ├── favicon.ico               # Favicon icon
@@ -109,9 +82,36 @@ cs50-final-project/
 │   |       |   └── route.js      # Endpoint to create a book using AI.
 │   |       └── book
 │   |           └── route.js      # Endpoint to create, update and delete a book.
-│   └── utils
-│       ├── headers.js            # Folder for adding specific headings to a query.
-│       └── utils.js              # Tools that enable additional functionality to the application backend.
+│   ├── utils
+│   │   ├── headers.js            # Folder for adding specific headings to a query.
+│   │   └── utils.js              # Tools that enable additional functionality to the application backend.
+│   └── styles                    # Styles folder
+│       ├── css                   # Css folder
+│       │   ├── components
+│       │   │   ├── panel.css
+│       │   │   ├── banner.css
+│       │   │   ├── forms.css
+│       │   │   ├── placeholder.css
+│       │   │   ├── playing.css
+│       │   │   ├── player.css
+│       │   │   ├── loader.css
+│       │   │   ├── popups.css
+│       │   │   └── buttons
+│       │   │       └── switch.css
+│       │   ├── theme
+│       │   │   ├── theme.css
+│       │   │   └── not-found.css
+│       │   ├── header
+│       │   │   └── theme.css
+│       │   └── footer
+│       │       └── theme.css
+│       ├── icons                 # Icons folder
+│       │   ├── ai.js
+│       │   ├── logo.js
+│       │   └── github.js
+│       └── fonts                 # Fonts folder
+│           ├── proxima-nova.woff
+│           └── montserrat.woff
 ├── .eslintrc.json
 ├── .gitignore
 ├── jsconfig.json

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "preview": "npx wrangler pages dev",
     "pages": "npx @cloudflare/next-on-pages",
@@ -20,10 +20,10 @@
     "react-lottie": "^1.2.10"
   },
   "devDependencies": {
-    "eslint": "^9.26.0",
+    "eslint": "^9.27.0",
     "eslint-config-next": "15.0.2",
     "vercel": "^40.1.0",
-    "wrangler": "^3.114.8"
+    "wrangler": "^3.114.9"
   },
   "packageManager": "pnpm@10.5.2+sha256.79a98daa90248b50815e31460790f118c56fe099113370826caa0153be6daba5"
 }

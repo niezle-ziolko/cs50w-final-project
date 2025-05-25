@@ -1,5 +1,5 @@
-'use client';
-import { createContext, useContext, useEffect, useState } from 'react';
+"use client";
+import { createContext, useContext, useEffect, useState } from "react";
 
 // Create a ThemeContext to manage the theme state globally (light/dark mode)
 const ThemeContext = createContext();
@@ -9,28 +9,28 @@ export function ThemeProvider({ children }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    // Check if the user prefers dark mode based on the system's color scheme
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Check if the user prefers dark mode based on the system"s color scheme
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
     // Get the stored theme from localStorage (if any)
-    const storedTheme = localStorage.getItem('theme');
+    const storedTheme = localStorage.getItem("theme");
     
     // If a theme is stored, use that. Otherwise, fall back to system preference.
     if (storedTheme) {
-      setIsDarkMode(storedTheme === 'dark');
+      setIsDarkMode(storedTheme === "dark");
     } else {
       setIsDarkMode(prefersDark);
     };
   }, []);
 
   useEffect(() => {
-    // If dark mode is enabled, add 'dark' class to the document and store the theme
+    // If dark mode is enabled, add "dark" class to the document and store the theme
     if (isDarkMode) {
-      document.documentElement.classList.add('dark'); // Apply dark mode styles globally
-      localStorage.setItem('theme', 'dark'); // Save dark mode preference in localStorage
+      document.documentElement.classList.add("dark"); // Apply dark mode styles globally
+      localStorage.setItem("theme", "dark"); // Save dark mode preference in localStorage
     } else {
-      document.documentElement.classList.remove('dark'); // Remove dark mode styles
-      localStorage.setItem('theme', 'light'); // Save light mode preference in localStorage
+      document.documentElement.classList.remove("dark"); // Remove dark mode styles
+      localStorage.setItem("theme", "light"); // Save light mode preference in localStorage
     };
   }, [isDarkMode]);
 

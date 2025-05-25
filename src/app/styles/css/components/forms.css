@@ -111,6 +111,7 @@
   box-shadow: 6px 6px 0px var(--primary-color);
   transform: translateX(-0.5em) translateY(-0.5em);
 }
+
 .file-upload input {
   display: none;
 }

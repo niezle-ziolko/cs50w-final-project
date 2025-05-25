@@ -1,13 +1,13 @@
-import GithubIcon from 'styles/icons/github';
+import GithubIcon from "styles/icons/github";
 
-import 'styles/css/footer/theme.css';
+import "styles/css/footer/theme.css";
 
 export default function Footer() {
   return(
-    <aside className='github'>
-      <div className='box'>
+    <aside className="github">
+      <div className="box">
         <div>
-          <a href='https://github.com/niezle-ziolko/cs50-final-project' target='_blank' rel="noreferrer">
+          <a href="https://github.com/niezle-ziolko/cs50w-final-project" target="_blank" rel="noreferrer">
             <p>View on GitHub</p>
             <GithubIcon />
           </a>

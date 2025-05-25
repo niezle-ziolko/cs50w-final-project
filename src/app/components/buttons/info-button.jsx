@@ -1,8 +1,8 @@
-'use client';
-import { useState } from 'react';
-import { createPortal } from 'react-dom';
+"use client";
+import { useState } from "react";
+import { createPortal } from "react-dom";
 
-import 'styles/css/components/popups.css';
+import "styles/css/components/popups.css";
 
 export default function InfoButton() {
   // State to control the visibility of the popup
@@ -11,16 +11,16 @@ export default function InfoButton() {
   return (
     <>
       {/* Info button that triggers the popup when clicked */}
-      <button className='info' onClick={() => setIsOpen(true)}>
+      <button className="info" onClick={() => setIsOpen(true)}>
         i
       </button>
 
       {/* Render the popup using createPortal if isOpen is true */}
       {isOpen &&
         createPortal(
-          <div className='popup'>
-            <div className='box'>
-              <div className='text'>
+          <div className="popup">
+            <div className="box">
+              <div className="text">
                 {/* Popup content explaining how the application works */}
                 <h2>How does it work?</h2>
                 <hr />
@@ -32,8 +32,8 @@ export default function InfoButton() {
                 <p>Also remember to add the title, cover and description of your book so users know what the book is.</p>
               </div>
               {/* Close button to hide the popup */}
-              <button onClick={() => setIsOpen(false)} className='close'>
-                <i className='fa-solid fa-xmark' />
+              <button onClick={() => setIsOpen(false)} className="close">
+                <i className="fa-solid fa-xmark" />
               </button>
             </div>
           </div>,

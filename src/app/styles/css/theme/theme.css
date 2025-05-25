@@ -53,11 +53,6 @@ input, textarea {
   background-color: var(--secondary-color);
 }
 
-input:hover, textarea:hover {
-  box-shadow: 10px 10px 0px var(--primary-color);
-  transform: translateX(-0.5em) translateY(-0.5em);
-}
-
 input::placeholder {
   color: var(--primary-color);
 }
@@ -96,11 +91,6 @@ form {
   display: var(--flex-display);
   border: var(--primary-border);
   background-color: var(--secondary-color);
-}
-
-form:hover {
-  box-shadow: 10px 10px 0px var(--primary-color);
-  transform: translateX(-0.5em) translateY(-0.5em);
 }
 
 h1 {

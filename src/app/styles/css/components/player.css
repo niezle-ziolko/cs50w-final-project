@@ -14,11 +14,6 @@
   background-color: var(--secondary-color);
 }
 
-.player .container:hover {
-  box-shadow: 10px 10px 0px var(--primary-color);
-  transform: translateX(-0.5em) translateY(-0.5em);
-}
-
 .player .image {
   display: var(--flex-display);
   justify-content: var(--center-align);
@@ -124,8 +119,6 @@ media-seek-forward-button:hover,
 media-seek-backward-button:hover {
   color: var(--secondary-theme-color);
   border: 2px solid var(--secondary-theme-color);
-  box-shadow: 10px 10px 0px var(--primary-color);
-  transform: translateX(-0.5em) translateY(-0.5em);
 }
 
 media-mute-button {

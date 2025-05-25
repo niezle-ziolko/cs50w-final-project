@@ -4,7 +4,7 @@
       "api/*": ["./src/api/*"],
       "lib/*": ["./src/lib/*"],
       "public/*": ["./public/*"],
-      "styles/*": ["./src/styles/*"],
+      "styles/*": ["./src/app/styles/*"],
       "utils/*": ["./src/app/utils/*"],
       "context/*": ["./src/app/context/*"],
       "components/*": ["./src/app/components/*"]
