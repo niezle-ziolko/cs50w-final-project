@@ -1,4 +1,4 @@
-import 'styles/css/components/forms.css';
+import "styles/css/components/forms.css";
 
 export default function AIIcon({ onClick }) {
   return (
