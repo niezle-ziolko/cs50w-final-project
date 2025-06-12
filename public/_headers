@@ -1,0 +1,50 @@
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-XSS-Protection: 1; mode=block
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), autoplay=(), camera=(), clipboard-read=(), clipboard-write=(), cross-origin-isolated=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(self), gyroscope=(), hid=(), idle-detection=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=()
+
+/*.js
+  Cache-Control: max-age=31536000, immutable
+  X-Robots-Tag: nosnippet
+
+/*.css
+  Cache-Control: max-age=31536000, immutable
+  X-Robots-Tag: nosnippet
+
+/*.webp
+  Cache-Control: max-age=31536000, immutable
+  X-Robots-Tag: nosnippet
+
+/*.png
+  Cache-Control: max-age=31536000, immutable
+  X-Robots-Tag: nosnippet
+
+/*.ico
+  Cache-Control: max-age=31536000, immutable
+  X-Robots-Tag: nosnippet
+
+/*.woff
+  Cache-Control: max-age=31536000, immutable
+  X-Robots-Tag: nosnippet
+
+/*.woff2
+  Cache-Control: max-age=31536000, immutable
+  X-Robots-Tag: nosnippet
+
+/*.eot
+  Cache-Control: max-age=31536000, immutable
+  X-Robots-Tag: nosnippet
+
+/*.ttf
+  Cache-Control: max-age=31536000, immutable
+  X-Robots-Tag: nosnippet
+
+/*.svg
+  Cache-Control: max-age=31536000, immutable
+  X-Robots-Tag: nosnippet
+
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Robots-Tag: nosnippet

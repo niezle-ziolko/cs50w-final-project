@@ -1,4 +1,4 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { bearerHeaders } from "utils/headers";
 
 import * as googleTTS from "google-tts-api";
@@ -6,8 +6,8 @@ import * as googleTTS from "google-tts-api";
 export async function POST(request) {
   try {
     // Get environment variables from the request context
-    const { env } = getRequestContext();
-    const authToken = getRequestContext().env.BOOK_AUTH;
+    const { env } = await getCloudflareContext({ async: true });
+    const authToken = env.BOOK_AUTH;
     
     // Validate the request using the Bearer token
     const authResponse = bearerHeaders(request, authToken);
@@ -154,5 +154,3 @@ export async function POST(request) {
   };
 };
 
-// Define the runtime environment as Edge Workers
-export const runtime = "edge";

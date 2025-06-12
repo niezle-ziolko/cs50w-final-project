@@ -1,11 +1,11 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { bearerHeaders } from "utils/headers";
 
 export async function GET(request) {
   try {
     // Get environment variables from request context
-    const { env } = getRequestContext();
-    const authToken = getRequestContext().env.BOOK_AUTH;
+    const { env } = await getCloudflareContext({ async: true });
+    const authToken = env.BOOK_AUTH;
 
     // Validate the request using the Bearer token
     const authResponse = bearerHeaders(request, authToken);
@@ -76,8 +76,8 @@ export async function GET(request) {
 };
 
 export async function POST(request) {
-  const { env } = getRequestContext();
-  const authToken = getRequestContext().env.BOOK_AUTH;
+  const { env } = await getCloudflareContext({ async: true });
+  const authToken = env.BOOK_AUTH;
 
   // Validate the request using the Bearer token
   const authResponse = bearerHeaders(request, authToken);
@@ -133,7 +133,7 @@ export async function POST(request) {
     // Upload the book"s picture to R2 storage
     const imageName = `${bookId}.webp`;
     const imageKey = `final-project/book-picture/${imageName}`;
-    await getRequestContext().env.R2.put(imageKey, picture);
+    await env.R2.put(imageKey, picture);
     const imageUrl = `https://cdn.niezleziolko.app/${imageKey}`;
 
     // Handle audio file uploads for the book
@@ -145,7 +145,7 @@ export async function POST(request) {
     for (const file of files) {
       const fileName = `${bookId}-${fileCounter}.mp3`;
       const fileKey = `final-project/book-file/${fileName}`;
-      await getRequestContext().env.R2.put(fileKey, file);
+      await env.R2.put(fileKey, file);
       const fileUrl = `https://cdn.niezleziolko.app/${fileKey}`;
       fileUrls.push(fileUrl);
 
@@ -211,6 +211,3 @@ export async function POST(request) {
     });
   };
 };
-
-// Set the runtime to edge for Cloudflare Workers
-export const runtime = "edge";

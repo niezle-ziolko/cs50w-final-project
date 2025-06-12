@@ -1,29 +1,39 @@
 {
-  "name": "final-project",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "preview": "npx wrangler pages dev",
-    "pages": "npx @cloudflare/next-on-pages",
-    "deploy": "pnpm pages && wrangler pages deploy",
-    "lint": "next lint --fix"
-  },
-  "dependencies": {
-    "@cloudflare/next-on-pages": "^1.13.12",
-    "google-tts-api": "^2.0.2",
-    "next": "15.1.6",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-lottie": "^1.2.10"
-  },
-  "devDependencies": {
-    "eslint": "^9.27.0",
-    "eslint-config-next": "15.0.2",
-    "vercel": "^40.1.0",
-    "wrangler": "^3.114.9"
-  },
-  "packageManager": "pnpm@10.5.2+sha256.79a98daa90248b50815e31460790f118c56fe099113370826caa0153be6daba5"
+    "name": "final-project",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "next dev --turbopack",
+        "build": "next build",
+        "lint": "next lint --fix",
+        "prod": "opennextjs-cloudflare build",
+        "deploy": "opennextjs-cloudflare deploy",
+        "preview": "opennextjs-cloudflare preview",
+        "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
+        "db": "wrangler d1 execute cs50 --file=./database/schema.sql"
+    },
+    "dependencies": {
+        "@apollo/client": "^3.13.8",
+		"@apollo/server": "^4.12.2",
+		"@as-integrations/cloudflare-workers": "^1.1.1",
+		"@graphql-tools/schema": "^10.0.23",
+		"@opennextjs/cloudflare": "^1.2.1",
+		"graphql": "^16.11.0",
+		"jose": "^6.0.11",
+        "google-tts-api": "^2.0.2",
+        "next": "15.3.3",
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0",
+        "react-lottie": "^1.2.10"
+    },
+    "devDependencies": {
+        "@eslint/eslintrc": "^3.3.1",
+		"@tailwindcss/postcss": "^4.1.8",
+		"eslint": "^9.28.0",
+		"eslint-config-next": "15.3.3",
+		"tailwindcss": "^4.1.8",
+		"wrangler": "^4.19.1"
+    },
+    "packageManager": "pnpm@10.5.2+sha256.79a98daa90248b50815e31460790f118c56fe099113370826caa0153be6daba5"
 }

@@ -24,12 +24,12 @@ export function ThemeProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    // If dark mode is enabled, add "dark" class to the document and store the theme
+    // If dark mode is enabled, set data-theme="dark" attribute, otherwise set data-theme="light"
     if (isDarkMode) {
-      document.documentElement.classList.add("dark"); // Apply dark mode styles globally
+      document.documentElement.setAttribute("data-theme", "dark"); // Apply dark mode styles globally
       localStorage.setItem("theme", "dark"); // Save dark mode preference in localStorage
     } else {
-      document.documentElement.classList.remove("dark"); // Remove dark mode styles
+      document.documentElement.setAttribute("data-theme", "light"); // Apply light mode styles
       localStorage.setItem("theme", "light"); // Save light mode preference in localStorage
     };
   }, [isDarkMode]);

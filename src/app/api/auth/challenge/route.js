@@ -1,10 +1,11 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { corsHeaders, bearerHeaders } from "utils/headers";
 
 export async function POST(request) {
   try {
+    const { env } = await getCloudflareContext({ async: true });
     // Get environment variables from the request context
-    const authToken = getRequestContext().env.CHALLENGE_AUTH;
+    const authToken = env.CHALLENGE_AUTH;
 
     // Validate the request using the Bearer token
     const authResponse = bearerHeaders(request, authToken);
@@ -36,7 +37,7 @@ export async function POST(request) {
 
     // Create a FormData object with required data for Cloudflare Turnstile verification
     let formData = new FormData();
-    formData.append("secret", getRequestContext().env.SECRET_KEY || ""); // Private key
+    formData.append("secret", env.SECRET_KEY || ""); // Private key
     formData.append("response", token); // User-provided token
     formData.append("remoteip", ip); // User"s IP address
 
@@ -75,6 +76,3 @@ export async function POST(request) {
     });
   };
 };
-
-// Define the runtime environment as Edge Workers
-export const runtime = "edge";

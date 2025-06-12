@@ -9,6 +9,7 @@ import Header from "components/header";
 import Footer from "components/footer";
 
 import "styles/css/theme/theme.css";
+import "styles/globals.css";
 
 const proximaNova = localFont({
   src: "./styles/fonts/proxima-nova.woff", 

@@ -1,11 +1,11 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { bearerHeaders } from "utils/headers";
 import { hashPassword } from "utils/utils";
 
 export async function GET(request) {
   try {
     // Get environment variables from the request context
-    const { env } = getRequestContext();
+    const { env } = await getCloudflareContext({ async: true });
     const authToken = env.CLIENT_AUTH;
    
     // Validate the request using the Bearer token
@@ -94,7 +94,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   // Get environment variables from the request context
-  const { env } = getRequestContext();
+  const { env } = await getCloudflareContext({ async: true });
   const authToken = env.CLIENT_AUTH;
 
   // Validate the request using the Bearer token
@@ -185,7 +185,7 @@ export async function POST(request) {
 export async function PUT(request) {
   try {
     // Get environment variables from the request context
-    const { env } = getRequestContext();
+    const { env } = await getCloudflareContext({ async: true });
     const authToken = env.CLIENT_AUTH;
 
     // Validate the request using the Bearer token
@@ -267,5 +267,3 @@ export async function PUT(request) {
   };
 };
 
-// Define the runtime environment as Edge Workers
-export const runtime = "edge";

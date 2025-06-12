@@ -1,12 +1,10 @@
-import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev';
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import { loadEnv } from './src/lib/env.js';
 
 loadEnv();
-setupDevPlatform().catch(console.error);
+initOpenNextCloudflareForDev();
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  
-};
+const nextConfig = {};
 
 export default nextConfig;

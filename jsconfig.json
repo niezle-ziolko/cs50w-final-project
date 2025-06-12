@@ -1,13 +1,13 @@
 {
-  "compilerOptions": {
-    "paths": {
-      "api/*": ["./src/api/*"],
-      "lib/*": ["./src/lib/*"],
-      "public/*": ["./public/*"],
-      "styles/*": ["./src/app/styles/*"],
-      "utils/*": ["./src/app/utils/*"],
-      "context/*": ["./src/app/context/*"],
-      "components/*": ["./src/app/components/*"]
+    "compilerOptions": {
+        "paths": {
+            "data/*": ["./src/data/*"],
+            "public/*": ["./public/*"],
+            "client/*": ["./src/app/client/*"],
+            "styles/*": ["./src/app/styles/*"],
+            "context/*": ["./src/app/context/*"],
+            "utils/*": ["./src/app/api/utils/*"],
+            "components/*": ["./src/app/components/*"]
+        }
     }
-  }
 }
