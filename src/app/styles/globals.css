@@ -3,23 +3,22 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @variant dark {
-  --color-primary: oklch(0.9071 0.0215 259.19);
-  --color-secondary: oklch(0.329 0 0);
+  --color-primary: oklch(1 0 0);
+  --color-secondary: oklch(0 0 0);
 }
 
 @theme {
-  --color-primary: oklch(0.329 0 0);
-  --color-secondary: oklch(0.9071 0.0215 259.19);
+  --color-primary: oklch(0 0 0);
+  --color-secondary: oklch(1 0 0);
 
   --color-b-100: oklch(0.329 0 0);
   --color-b-200: oklch(0.2046 0 0);
 
   --color-r-100: oklch(0.5274 0.1751 25.55);
 
-  --color-bl-100: oklch(0.6562 0.1895 251);
-  --color-bl-200: oklch(0.5472 0.1966 258.23);
+  --color-bl-100: oklch(0.5582 0.1307 241.73);
 
-  --color-g-100: oklch(0.9071 0.0215 259.19);
+  --color-g-100: oklch(0.931 0 0);
   --color-g-200: oklch(0.6764 0 0);
 
   --color-or-100: oklch(0.6905 0.056 65.74);
@@ -35,18 +34,22 @@
   --spacing-qp: 25%;
   --spacing-hp: 50%;
 
+  --spacing-oh: 0.063rem;
   --spacing-ot: 0.1rem;
   --spacing-t: 0.125rem;
   --spacing-q: 0.25rem;
   --spacing-s: 0.375rem;
   --spacing-o: 1rem;
-  --spacing-twh: 12.5rem;
 
   --ff: 45deg;
 
   --margin: 0.625rem 0;
 
   --transition: all 0.5s;
+  --transition-ease: 0.4s ease-in-out;
+
+  --box-shadow: 6px 6px 0px var(--color-primary);
+  --transform: translateX(-0.5rem) translateY(-0.5rem);
 
   --animate-interference: interference 0.2s infinite alternate;
 
@@ -97,7 +100,13 @@
 
 /* end of 404 */
 
+@utility u10 {
+  @apply mb-4 gap-5 flex items-center justify-center;
+}
 
+@utility u11 {
+  @apply flex text-lg hover:font-bold hover:cursor-pointer transition-(--transition);
+}
 
 @layer base {
   body {
@@ -121,7 +130,7 @@
   }
 
   a {
-    @apply text-black break-all font-bold no-underline;
+    @apply text-primary break-all no-underline;
   }
 
   p, li {
@@ -158,7 +167,7 @@
   }
 
   button {
-    @apply u1 cursor-pointer border-2 border-bl-100 font-bold rounded-sm mr-0 mb-2 md:mb-0;
+    @apply py-2 px-6 text-base font-bold rounded-sm cursor-pointer bg-bl-100 transition-(--transition) border-2 border-primary text-b-100 hover:shadow-(--box-shadow) hover:transform-(--transform) font-(family-name:--secondary-font-family);
   }
 }
 

@@ -15,13 +15,13 @@
     },
     "dependencies": {
         "@apollo/client": "^3.13.8",
-		"@apollo/server": "^4.12.2",
-		"@as-integrations/cloudflare-workers": "^1.1.1",
-		"@graphql-tools/schema": "^10.0.23",
-		"@opennextjs/cloudflare": "^1.2.1",
-		"graphql": "^16.11.0",
-		"jose": "^6.0.11",
+        "@apollo/server": "^4.12.2",
+        "@as-integrations/cloudflare-workers": "^1.1.1",
+        "@graphql-tools/schema": "^10.0.23",
+        "@opennextjs/cloudflare": "^1.2.1",
         "google-tts-api": "^2.0.2",
+        "graphql": "^16.11.0",
+        "jose": "^6.0.11",
         "next": "15.3.3",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
@@ -29,11 +29,11 @@
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3.3.1",
-		"@tailwindcss/postcss": "^4.1.8",
-		"eslint": "^9.28.0",
-		"eslint-config-next": "15.3.3",
-		"tailwindcss": "^4.1.8",
-		"wrangler": "^4.19.1"
+        "@tailwindcss/postcss": "^4.1.8",
+        "eslint": "^9.28.0",
+        "eslint-config-next": "15.3.3",
+        "tailwindcss": "^4.1.8",
+        "wrangler": "^4.19.1"
     },
     "packageManager": "pnpm@10.5.2+sha256.79a98daa90248b50815e31460790f118c56fe099113370826caa0153be6daba5"
 }

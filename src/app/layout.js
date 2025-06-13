@@ -30,6 +30,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
         <Script src="https://cdn.jsdelivr.net/npm/media-chrome@3/+esm" type="module" strategy="afterInteractive" />
       </head>
@@ -38,7 +39,7 @@ export default function RootLayout({ children }) {
           <AuthProvider>
             <AudioProvider>
               <Header />
-              <main>{children}</main>
+              <main className="grid py-4 px-5 align-center">{children}</main>
               <Footer />
             </AudioProvider>
           </AuthProvider>
