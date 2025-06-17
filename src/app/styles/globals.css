@@ -16,7 +16,7 @@
 
   --color-r-100: oklch(0.5274 0.1751 25.55);
 
-  --color-bl-100: oklch(0.5582 0.1307 241.73);
+  --color-v-100: lch(48.89 59.37 295.81);
 
   --color-g-100: oklch(0.931 0 0);
   --color-g-200: oklch(0.6764 0 0);
@@ -32,6 +32,7 @@
   --color-or-900: oklch(0.3613 0.0506 60.43);
 
   --spacing-qp: 25%;
+  --spacing-ft: 15%;
   --spacing-hp: 50%;
 
   --spacing-oh: 0.063rem;
@@ -101,11 +102,27 @@
 /* end of 404 */
 
 @utility u10 {
-  @apply mb-4 gap-5 flex items-center justify-center;
+  @apply border-2 rounded-sm border-primary hover:shadow-(--box-shadow) hover:transform-(--transform) transition-(--transition);
 }
 
 @utility u11 {
-  @apply flex text-lg hover:font-bold hover:cursor-pointer transition-(--transition);
+  @apply u1 mb-4 gap-5;
+}
+
+@utility u12 {
+  @apply flex hover:font-bold hover:cursor-pointer md:text-lg transition-(--transition);
+}
+
+@utility u13 {
+  @apply md:text-lg font-bold;
+}
+
+@utility u14 {
+  @apply flex flex-col items-center;
+}
+
+@utility u15 {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-8;
 }
 
 @layer base {
@@ -114,19 +131,19 @@
   }
   
   h1 {
-    @apply md:text-4xl text-2xl font-bold text-secondary;
+    @apply my-5 md:text-4xl text-2xl font-bold text-primary font-(family-name:--secondary-font-family);
   }
 
   h2 {
-    @apply md:text-2xl text-xl font-bold text-primary m-(--margin);
+    @apply text-xl font-bold text-primary m-(--margin) font-(family-name:--secondary-font-family);
   }
 
   h3 {
-    @apply md:text-sm text-sm m-(--margin) text-primary mb-1 font-bold;
+    @apply mb-5 md:mb-10 text-2xl md:text-3xl text-primary text-center font-bold font-(family-name:--secondary-font-family);
   }
 
   h4 {
-    @apply text-bl-100 md:text-base text-xs mt-s text-center font-bold;
+    @apply md:text-base text-sm m-(--margin) text-black font-bold font-(family-name:--secondary-font-family);
   }
 
   a {
@@ -134,7 +151,7 @@
   }
 
   p, li {
-    @apply text-sm text-primary;
+    @apply text-base md:text-base text-primary;
   }
 
   ol {
@@ -147,7 +164,7 @@
 
   input,
   select {
-    @apply h-10 p-2 text-sm text-primary border-2 border-bl-100 outline-none rounded-md bg-transparent;
+    @apply h-10 p-2 text-sm text-primary border-2 border-v-100 outline-none rounded-md bg-transparent;
   }
 
   option{
@@ -163,14 +180,14 @@
   }
 
   section {
-    @apply p-4 overflow-hidden max-h-125 text-primary border-2 border-bl-100 mb-5 rounded-md transition-(--transition);
+    @apply py-5 md:py-10 mb-5 rounded-md transition-(--transition);
   }
 
   button {
-    @apply py-2 px-6 text-base font-bold rounded-sm cursor-pointer bg-bl-100 transition-(--transition) border-2 border-primary text-b-100 hover:shadow-(--box-shadow) hover:transform-(--transform) font-(family-name:--secondary-font-family);
+    @apply u10 py-2 px-6 text-black text-base font-bold cursor-pointer bg-v-100 text-black font-(family-name:--secondary-font-family);
   }
 }
 
 @layer components {
-  
+
 }

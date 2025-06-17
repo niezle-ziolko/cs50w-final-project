@@ -10,11 +10,11 @@ export default function Header() {
   const { user } = useAuth();
 
   return (
-    <header className="mb-5 py-4 px-5">
-      <div className="py-0 px-8 flex justify-between border-b-2 border-b-primary">
-        <div className="u10">
+    <header className="mb-0 md:mb-5 py-4 px-5">
+      <div className="py-0 px-0 md:px-8 flex justify-between border-b-2 border-b-primary">
+        <div className="u11">
           <div>
-            <Link href="/">
+            <Link href="/" aria-label="home-page">
               <LogoIcon />
             </Link>
           </div>
@@ -22,7 +22,7 @@ export default function Header() {
             <img className="rounded-full border-primary border-2" src={user.photo} alt="profile-picture" width="70" height="70" />
           ) : null}
         </div>
-        <div className="u10">
+        <div className="u11">
           <div className="flex h-full text-center items-center">
             <NavMenu />
           </div>

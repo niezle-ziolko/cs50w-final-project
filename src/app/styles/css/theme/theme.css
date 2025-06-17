@@ -56,23 +56,6 @@ form {
   background-color: var(--secondary-color);
 }
 
-h1 {
-  font-size: var(--secondary-space);
-  font-family: var(--secondary-font-family);
-}
-
-h2 {
-  font-size: 1.2em;
-  font-family: var(--secondary-font-family);
-}
-
-p {
-  margin-top: 0px;
-  margin-bottom: 0px;
-  color: var(--primary-color);
-  font-size: var(--primary-space);
-}
-
 hr {
   width: var(--full-space);
   margin: var(--null-space);
@@ -95,10 +78,4 @@ textarea::placeholder {
 .page {
   gap: 50px;
   display: var(--flex-display);
-}
-
-.page.home {
-  padding-left: 15%;
-  padding-right: 15%;
-  padding-bottom: 25px;
 }
