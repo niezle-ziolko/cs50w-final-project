@@ -2,11 +2,15 @@
 import { useState } from "react";
 import Script from "next/script";
 import { useRouter } from "next/navigation";
+
 import { useAuth } from "context/auth-context";
+import { useTheme } from "context/theme-context";
 
 import Loader from "components/loader";
 
 export default function SignInForm() {
+  // Get dark mode status from context
+  const { isDarkMode } = useTheme();
   // Router for navigation after successful login
   const router = useRouter();
   // User context to update the user data after login
@@ -107,26 +111,24 @@ export default function SignInForm() {
   const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_SITE_KEY;
 
   return (
-    <div>
-      {/* Load the Turnstile script from Cloudflare to handle bot verification */}
+    <>
+      {/* Load the Turnstile script from Cloudflare for bot verification */}
       <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" />
-      <div className="form login">
-        <form className="form" onSubmit={handleSubmit}>
-          <p className="heading">Sign in</p>
-          {/* Username input field */}
-          <input className="input" name="username" placeholder="Username" type="text" value={formData.username} onChange={handleChange} required />
-          {/* Password input field */}
-          <input className="input" name="password" placeholder="Password" type="password" value={formData.password} onChange={handleChange} required />
-          {/* Turnstile widget for bot verification */}
-          <div className="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-callback="javascriptCallback" data-theme="dark" />
-          {/* Display error message if any */}
-          {error && <p className="error-message">{error}</p>}
-          {/* Submit button, shows loading indicator while processing */}
-          <button className="button" type="submit" disabled={loading}>
-            {loading ? <Loader /> : "Submit"}
-          </button>
-        </form>
-      </div>
-    </div>
+      <form onSubmit={handleSubmit}>
+        <h2 className="mb-12">Sign in</h2>
+        {/* Username input field */}
+        <input name="username" placeholder="Username" type="text" value={formData.username} onChange={handleChange} required />
+        {/* Password input field */}
+        <input name="password" placeholder="Password" type="password" value={formData.password} onChange={handleChange} required />
+        {/* Turnstile widget for bot verification */}
+        <div className="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-callback="javascriptCallback" data-theme={isDarkMode ? "dark" : "light"} />
+        {/* Display error message if any */}
+        {error && <p className="u16">{error}</p>}
+        {/* Submit button, shows loading indicator while processing */}
+        <button className="u1 w-full h-11" type="submit" disabled={loading}>
+          {loading ? <Loader /> : "Submit"}
+        </button>
+      </form>
+    </>
   );
 };

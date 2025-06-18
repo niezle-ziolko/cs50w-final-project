@@ -23,7 +23,7 @@ const montserrat = localFont({
 
 export const metadata = {
   title: "EchoVerse",
-  description: "A universe that speak to you"
+  description: "A universe that speak to you!"
 };
 
 export default function RootLayout({ children }) {
@@ -39,7 +39,7 @@ export default function RootLayout({ children }) {
           <AuthProvider>
             <AudioProvider>
               <Header />
-              <main className="grid py-4 px-5 align-center">{children}</main>
+              <main className="grid py-4 px-5 align-center md:justify-center">{children}</main>
               <Footer />
             </AudioProvider>
           </AuthProvider>

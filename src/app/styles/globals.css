@@ -3,20 +3,18 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @variant dark {
-  --color-primary: oklch(1 0 0);
-  --color-secondary: oklch(0 0 0);
+  --color-primary: oklch(0.903 0.1071 198.36);
+  --color-secondary: oklch(0.3694 0.031 279.8);
 }
 
 @theme {
-  --color-primary: oklch(0 0 0);
-  --color-secondary: oklch(1 0 0);
+  --color-primary: oklch(0.3694 0.031 279.8);
+  --color-secondary: oklch(0.903 0.1071 198.36);
 
   --color-b-100: oklch(0.329 0 0);
   --color-b-200: oklch(0.2046 0 0);
 
-  --color-r-100: oklch(0.5274 0.1751 25.55);
-
-  --color-v-100: lch(48.89 59.37 295.81);
+  --color-r-100: oklch(0.6211 0.2536 27.66);
 
   --color-g-100: oklch(0.931 0 0);
   --color-g-200: oklch(0.6764 0 0);
@@ -53,12 +51,22 @@
   --transform: translateX(-0.5rem) translateY(-0.5rem);
 
   --animate-interference: interference 0.2s infinite alternate;
+  --animate-loader: loader 1s infinite ease;
 
   @keyframes interference {
     100% {
       background-position:
         50% 0,
         60% 50%;
+    }
+  }
+
+  @keyframes loader {
+    0%, 10%, 20%, 30%, 40%, 60%, 70%, 80%, 90%, 100% {
+      transform: rotate(var(--rotation)) translate(0, 150%);
+    }
+    50% {
+      transform: rotate(var(--rotation)) translate(0, 225%);
     }
   }
 }
@@ -103,6 +111,16 @@
 
 @utility u10 {
   @apply border-2 rounded-sm border-primary hover:shadow-(--box-shadow) hover:transform-(--transform) transition-(--transition);
+
+  &:hover {
+    box-shadow: var(--box-shadow);
+    -webkit-box-shadow: var(--box-shadow);
+    -moz-box-shadow: var(--box-shadow);
+
+    transform: var(--transform);
+    -webkit-transform: var(--transform);
+    -moz-transform: var(--transform);
+  }
 }
 
 @utility u11 {
@@ -125,6 +143,10 @@
   @apply grid grid-cols-1 md:grid-cols-3 gap-8;
 }
 
+@utility u16 {
+  @apply text-r-100 font-bold w-full text-left;
+}
+
 @layer base {
   body {
     @apply max-w-screen m-0 overflow-x-hidden transition-(--transition) bg-secondary font-(family-name:--primary-font-family);
@@ -142,10 +164,6 @@
     @apply mb-5 md:mb-10 text-2xl md:text-3xl text-primary text-center font-bold font-(family-name:--secondary-font-family);
   }
 
-  h4 {
-    @apply md:text-base text-sm m-(--margin) text-black font-bold font-(family-name:--secondary-font-family);
-  }
-
   a {
     @apply text-primary break-all no-underline;
   }
@@ -158,13 +176,21 @@
     @apply list-decimal py-2 px-5;
   }
 
+  form {
+    @apply u1 w-full p-5 md:p-8 gap-3 flex-col top-0 left-0 right-0 bottom-0 border-2 border-primary rounded-sm;
+  }
+
   label {
     @apply grid text-base p-s;
   }
 
   input,
   select {
-    @apply h-10 p-2 text-sm text-primary border-2 border-v-100 outline-none rounded-md bg-transparent;
+    @apply h-10 w-full p-2 text-sm md:min-w-xs text-primary border-2 outline-none rounded-md;
+  }
+
+  input::placeholder {
+    @apply text-primary;
   }
 
   option{
@@ -184,10 +210,12 @@
   }
 
   button {
-    @apply u10 py-2 px-6 text-black text-base font-bold cursor-pointer bg-v-100 text-black font-(family-name:--secondary-font-family);
+    @apply u10 py-2 px-6 text-primary text-base font-bold cursor-pointer bg-secondary text-black font-(family-name:--secondary-font-family);
   }
 }
 
 @layer components {
-
+  .loader-bar {
+    @apply w-1/2 h-full absolute bg-primary animate-loader;
+  }
 }

@@ -1,34 +1,3 @@
-.heading {
-  font-size: 18px;
-  font-weight: bold;
-  color: var(--primary-color);
-  text-align: var(--center-align);
-  padding-bottom: var(--secondary-space);
-  font-family: var(--secondary-font-family);
-}
-
-.input {
-  padding: 0.7em;
-  outline: var(--none-space);
-}
-
-.form .button {
-  height: 43px;
-  padding: 0.7em;
-  display: var(--flex-display);
-  align-items: var(--center-align);
-  margin-top: var(--secondary-space);
-  padding-left: var(--primary-space);
-  padding-right: var(--primary-space);
-  justify-content: var(--center-align);
-}
-
-.form.login {
-  width: 24em;
-  align-self: var(--center-align);
-  position: var(--relative-position);
-}
-
 .form.edit, .form.create-book {
   width: 24em;
   min-height: 48em;

@@ -32,7 +32,7 @@ export default function NavMenu() {
               |
             </li>
             <li className="u12">
-              <button onClick={logoutUser} aria-label="logout-page">Logout</button>
+              <button className="text-xs px-1 py-1 md:text-base md:px-7 md:py-2" onClick={logoutUser} aria-label="logout-page">Logout</button>
             </li>
           </>
         ) : (

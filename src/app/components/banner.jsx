@@ -80,7 +80,7 @@ export default function Banner() {
               text: "Have anytime, anywhere access to your favorite titles.",
             },
           ].map(({ animation, width, height, title, text }, i) => (
-            <div className="u10 h-63 grid p-6 items-center text-center" key={i}>
+            <div className="u10 h-63 grid p-6 items-center text-center rounded-lg" key={i}>
               <Lottie options={defaultLottieOptions(animation)} width={width} height={height} />
               <h2>{title}</h2>
               <p>{text}</p>
@@ -89,10 +89,9 @@ export default function Banner() {
         </div>
       </section>
 
-
       {/* Popular Audiobooks */}
       <section>
-        <div className="max-w-6xl mx-auto">
+        <div>
           <h3>Popular Audiobooks</h3>
           <div className="u15">
             {[
@@ -109,19 +108,18 @@ export default function Banner() {
                 title: "The Lord of the Rings - The Fellowship of the Ring",
               },
             ].map((book, index) => (
-              <div key={index} className="group relative overflow-hidden rounded-lg shadow-md">
+              <div key={index} className="group relative overflow-hidden rounded-lg shadow-md focus:outline-none" tabIndex={0}>
                 <Image
                   src={book.src}
                   alt={book.title}
-                  width={325}
-                  height={482}
-                  className="h-[482px] w-full object-cover border-2 border-primary rounded-lg transition-all duration-300 group-hover:blur-xs"
+                  width={600}
+                  height={757}
+                  className="h-auto w-full border-2 rounded-lg object-cover border-primary duration-300 transition-all group-hover:blur-xs group-focus:blur-xs group-active:blur-xs"
                 />
-                <div className="absolute inset-0 p-4 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <h4 className="mb-3 font-semibold">{book.title}</h4>
-                    <button className="border-black hover:shadow-[6px_6px_0px_black]" onClick={() => router.push("/auth/library")}>
-                    Listen
+                <div className="u1 p-4 absolute inset-0 opacity-0 rounded-lg duration-300 transition-all group-hover:opacity-100 group-focus:opacity-100 group-active:opacity-100">
+                  <div className="text-center">
+                    <button onClick={() => router.push("/auth/library")}>
+                Listen
                     </button>
                   </div>
                 </div>
@@ -131,47 +129,61 @@ export default function Banner() {
         </div>
       </section>
 
-
       {/* Testimonials */}
       <section>
         <div className="text-center">
           <h3>User reviews</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Testimonial
-              name="Anna"
-              text="I love this platform! I discovered so many amazing stories and was finally able to create my own audiobook."
-            />
-            <Testimonial
-              name="Mark"
-              text="The best app for listening and creating audiobooks! Very intuitive and user friendly."
-            />
+            {[
+              {
+                src: "/ce2f1653-5b32-4d3a-8f70-5d3f1a6f843d.webp",
+                comment: "Sharing my book and audio version through EchoVerse was trivial. A few clicks and I'm done - I can share it with the world!",
+                author: "Anna",
+              },
+              {
+                src: "/f2ac1f7e-3fa0-4cb8-b2ab-b7e63a2a74c2.webp",
+                comment: "Listening to audiobooks with EchoVerse is a pleasure. The app is intuitive, runs smoothly, and the selection of titles is really impressive!",
+                author: "David",
+              },
+              {
+                src: "/98d3f022-988e-48d4-9c9e-1c64df2bbdc6.webp",
+                comment: "Creating audiobooks using AI in EchoVerse is a gamechanger. I don't need a studio or a voiceover - the app does it for me, and the end result is surprisingly good.",
+                author: "Lisa",
+              },
+              {
+                src: "/2780a0a3-11b3-4bb3-bef4-7ef75f7de7c5.webp",
+                comment: "With EchoVerse, I can fire up an audiobook literally in seconds. Navigation is super easy and the sound quality is great. The perfect app for commuting!",
+                author: "Mark",
+              },
+            ].map((review, index) => (
+              <div key={index} className="p-6 flex border-2 border-primary text-left rounded-lg">
+                <Image
+                  width={500}
+                  height={500}
+                  src={review.src}
+                  alt={`Avatar of ${review.author}`}
+                  className="h-20 w-20 rounded-lg"
+                />
+                <div className="w-full px-2">
+                  <p className="italic mb-1">{review.comment}</p>
+                  <p className="text-sm font-bold">- {review.author}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Call To Action */}
-      <section className=" px-6 bg-gray-50">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Zacznij swoją przygodę już dziś</h2>
-          <p className="text-lg text-gray-700 mb-8">
-            Dołącz do naszej społeczności i odkryj nowy wymiar słuchania książek.
-          </p>
-          <Link href="/signup">
-            <button className="py-2 px-6 text-base font-bold rounded-sm cursor-pointer bg-bl-100 transition-all border-2 border-primary text-b-100 hover:shadow-lg hover:scale-105 font-[var(--secondary-font-family)]">
-              Zarejestruj się
-            </button>
-          </Link>
+      <section>
+        <div className="text-center">
+          <h3 className="mb-4">Start your adventure today</h3>
+          <p className="mb-4">Join our community and discover a new dimension of listening to books.</p>
+          <button onClick={() => router.push("/auth/register")}>
+              Sign up
+          </button>
         </div>
       </section>
     </div>
   );
 };
-
-function Testimonial({ name, text }) {
-  return (
-    <div className="bg-gray-100 p-6 rounded-xl shadow-sm text-left">
-      <p className="text-gray-800 italic mb-4">{text}</p>
-      <p className="text-sm text-gray-600 font-semibold">- {name}</p>
-    </div>
-  );
-}

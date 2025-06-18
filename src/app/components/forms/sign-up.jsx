@@ -113,30 +113,28 @@ export default function SignUpForm() {
   const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_SITE_KEY;
 
   return (
-    <div>
+    <>
       {/* Load the Turnstile script from Cloudflare for bot verification */}
       <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" />
-      <div className="form login">
-        <form className="form" onSubmit={handleSubmit}>
-          <p className="heading">Sign up</p>
-          {/* Username input field */}
-          <input className="input" name="username" placeholder="Username" type="text" onChange={handleChange} required />
-          {/* Email input field */}
-          <input className="input" name="email" placeholder="E-mail" type="email" onChange={handleChange} required />
-          {/* Password input field */}
-          <input className="input" name="password" placeholder="Password" type="password" onChange={handleChange} required />
-          {/* Confirm password input field */}
-          <input className="input" name="confirmPassword" placeholder="Confirm password" type="password" onChange={handleChange} required />
-          {/* Turnstile widget for bot verification */}
-          <div className="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-callback="javascriptCallback" data-theme="dark" />
-          {/* Display error message if any */}
-          {error && <p className="error-message">{error}</p>}
-          {/* Submit button, shows loading indicator while processing */}
-          <button className="button" type="submit" disabled={loading}>
-            {loading ? <Loader /> : "Submit"}
-          </button>
-        </form>
-      </div>
-    </div>
+      <form onSubmit={handleSubmit}>
+        <h2 className="mb-12">Sign up</h2>
+        {/* Username input field */}
+        <input name="username" placeholder="Username" type="text" onChange={handleChange} required />
+        {/* Email input field */}
+        <input name="email" placeholder="E-mail" type="email" onChange={handleChange} required />
+        {/* Password input field */}
+        <input name="password" placeholder="Password" type="password" onChange={handleChange} required />
+        {/* Confirm password input field */}
+        <input name="confirmPassword" placeholder="Confirm password" type="password" onChange={handleChange} required />
+        {/* Turnstile widget for bot verification */}
+        <div className="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-callback="javascriptCallback" data-theme="dark" />
+        {/* Display error message if any */}
+        {error && <p className="u16">{error}</p>}
+        {/* Submit button, shows loading indicator while processing */}
+        <button className="u1 w-full h-11" type="submit" disabled={loading}>
+          {loading ? <Loader /> : "Submit"}
+        </button>
+      </form>
+    </>
   );
 };
