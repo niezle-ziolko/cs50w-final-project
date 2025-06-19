@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
@@ -42,10 +41,10 @@ export default function Banner() {
               <h1>EchoVerse a Universe that speak to You</h1>
               <p className="mt-4 mb-6">Listen, create and share audiobooks with other users.</p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <button onClick={() => router.push("/auth/library")}>
+                <button className="w-auto" onClick={() => router.push("/auth/library")}>
                   Browse Audiobooks
                 </button>
-                <button onClick={() => router.push("/auth/create-book")}>
+                <button className="w-auto" onClick={() => router.push("/auth/create-book")}>
                   Create Audiobook
                 </button>
               </div>
@@ -56,7 +55,7 @@ export default function Banner() {
 
       {/* Features Section */}
       <section>
-        <div className="u15">
+        <div className="u17">
           {[
             {
               animation: heartData,
@@ -93,7 +92,7 @@ export default function Banner() {
       <section>
         <div>
           <h3>Popular Audiobooks</h3>
-          <div className="u15">
+          <div className="u17">
             {[
               {
                 src: "/f0bdce3a-4e60-4215-9f3e-25a3fbd479ee.webp",
@@ -119,7 +118,7 @@ export default function Banner() {
                 <div className="u1 p-4 absolute inset-0 opacity-0 rounded-lg duration-300 transition-all group-hover:opacity-100 group-focus:opacity-100 group-active:opacity-100">
                   <div className="text-center">
                     <button onClick={() => router.push("/auth/library")}>
-                Listen
+                      Listen
                     </button>
                   </div>
                 </div>
@@ -179,9 +178,11 @@ export default function Banner() {
         <div className="text-center">
           <h3 className="mb-4">Start your adventure today</h3>
           <p className="mb-4">Join our community and discover a new dimension of listening to books.</p>
-          <button onClick={() => router.push("/auth/register")}>
+          <div className="flex justify-center">
+            <button className="w-auto" onClick={() => router.push("/auth/register")}>
               Sign up
-          </button>
+            </button>
+          </div>
         </div>
       </section>
     </div>

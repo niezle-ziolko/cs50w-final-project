@@ -10,41 +10,46 @@ export default function NavMenu() {
 
   return (
     <div className="flex gap-4 md:gap-13 items-center">
-      <ul className="p-0 flex gap-2 md:gap-13 text-xl items-center text-primary">
+      <ul className="p-0 flex gap-3 md:gap-13 text-xl items-center text-primary">
         {user ? (
           <>
             <li className="u12">
-              <Link href="/auth/library" aria-label="library-page">Library</Link>
+              <Link className="u14" href="/auth/library" aria-label="library-page"><i className="fa-solid fa-book" /></Link>
+              <Link className="u15" href="/auth/library" aria-label="library-page">Library</Link>
             </li>
             <li className="u13">
               |
             </li>
             <li className="u12">
-              <Link href="/auth/create-book" aria-label="library-page">Create</Link>
+              <Link className="u14" href="/auth/create-book" aria-label="create-page"><i className="fa-solid fa-pen-fancy" /></Link>
+              <Link className="u15" href="/auth/create-book" aria-label="create-page">Create</Link>
             </li>
             <li className="u13">
               |
             </li>
             <li className="u12">
-              <Link href="/auth/my-account" aria-label="account-page">My account</Link>
+              <Link className="u14" href="/auth/my-account" aria-label="account-page"><i className="fa-solid fa-user" /></Link>
+              <Link className="u15" href="/auth/my-account" aria-label="account-page">My account</Link>
             </li>
             <li className="u13">
               |
             </li>
             <li className="u12">
-              <button className="text-xs px-1 py-1 md:text-base md:px-7 md:py-2" onClick={logoutUser} aria-label="logout-page">Logout</button>
+              <button className="text-xs px-1 py-1 md:text-base md:px-7 md:py-2 w-full h-full" onClick={logoutUser} aria-label="logout-page">Logout</button>
             </li>
           </>
         ) : (
           <>
             <li className="u12">
-              <Link href="/auth/login" aria-label="login-page">Sign in</Link>
+              <Link className="u14" href="/auth/login" aria-label="login-page"><i className="fa-solid fa-user" /></Link>
+              <Link className="u15" href="/auth/login" aria-label="login-page">Sign in</Link>
             </li>
             <li className="u13">
               |
             </li>
             <li className="u12">
-              <Link href="/auth/register" aria-label="register-page">Sign up</Link>
+              <Link className="u14" href="/auth/register" aria-label="register-page"><i className="fa-solid fa-user-plus" /></Link>
+              <Link className="u15" href="/auth/register" aria-label="register-page">Sign up</Link>
             </li>
           </>
         )}

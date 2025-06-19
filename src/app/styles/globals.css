@@ -14,7 +14,7 @@
   --color-b-100: oklch(0.329 0 0);
   --color-b-200: oklch(0.2046 0 0);
 
-  --color-r-100: oklch(0.6211 0.2536 27.66);
+  --color-r-100: oklch(52.74% 0.1751 25.55);
 
   --color-g-100: oklch(0.931 0 0);
   --color-g-200: oklch(0.6764 0 0);
@@ -41,8 +41,6 @@
   --spacing-o: 1rem;
 
   --ff: 45deg;
-
-  --margin: 0.625rem 0;
 
   --transition: all 0.5s;
   --transition-ease: 0.4s ease-in-out;
@@ -128,7 +126,7 @@
 }
 
 @utility u12 {
-  @apply flex hover:font-bold hover:cursor-pointer md:text-lg transition-(--transition);
+  @apply grid md:flex hover:font-bold hover:cursor-pointer md:text-lg transition-(--transition);
 }
 
 @utility u13 {
@@ -136,15 +134,35 @@
 }
 
 @utility u14 {
-  @apply flex flex-col items-center;
+  @apply text-2xl block md:hidden;
 }
 
 @utility u15 {
-  @apply grid grid-cols-1 md:grid-cols-3 gap-8;
+  @apply hidden md:block;
 }
 
 @utility u16 {
+  @apply flex flex-col items-center;
+}
+
+@utility u17 {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-8;
+}
+
+@utility u18 {
   @apply text-r-100 font-bold w-full text-left;
+}
+
+@utility u19 {
+  @apply p-10 gap-1 flex flex-col border-2 border-primary rounded-md bg-secondary transition-(--transition);
+}
+
+@utility u20 {
+  @apply u1 w-full md:w-50 h-71 gap-3 relative text-center rounded-md border-2 border-primary;
+}
+
+@utility u21 {
+  @apply overflow-hidden;
 }
 
 @layer base {
@@ -157,7 +175,7 @@
   }
 
   h2 {
-    @apply text-xl font-bold text-primary m-(--margin) font-(family-name:--secondary-font-family);
+    @apply text-xl font-bold text-primary my-3 font-(family-name:--secondary-font-family);
   }
 
   h3 {
@@ -189,10 +207,6 @@
     @apply h-10 w-full p-2 text-sm md:min-w-xs text-primary border-2 outline-none rounded-md;
   }
 
-  input::placeholder {
-    @apply text-primary;
-  }
-
   option{
     @apply bg-secondary;
   }
@@ -210,12 +224,12 @@
   }
 
   button {
-    @apply u10 py-2 px-6 text-primary text-base font-bold cursor-pointer bg-secondary text-black font-(family-name:--secondary-font-family);
+    @apply u1 u10 w-28 h-11 py-2 px-6 text-primary text-base font-bold cursor-pointer bg-secondary text-black font-(family-name:--secondary-font-family);
   }
 }
 
 @layer components {
   .loader-bar {
-    @apply w-1/2 h-full absolute bg-primary animate-loader;
+    @apply w-[35%] h-[65%] absolute bg-primary animate-loader;
   }
 }

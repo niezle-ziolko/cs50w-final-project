@@ -116,7 +116,7 @@ export default function SignUpForm() {
     <>
       {/* Load the Turnstile script from Cloudflare for bot verification */}
       <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" />
-      <form onSubmit={handleSubmit}>
+      <form className="md:w-97" onSubmit={handleSubmit}>
         <h2 className="mb-12">Sign up</h2>
         {/* Username input field */}
         <input name="username" placeholder="Username" type="text" onChange={handleChange} required />
@@ -129,9 +129,9 @@ export default function SignUpForm() {
         {/* Turnstile widget for bot verification */}
         <div className="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-callback="javascriptCallback" data-theme="dark" />
         {/* Display error message if any */}
-        {error && <p className="u16">{error}</p>}
+        {error && <p className="u18">{error}</p>}
         {/* Submit button, shows loading indicator while processing */}
-        <button className="u1 w-full h-11" type="submit" disabled={loading}>
+        <button type="submit" disabled={loading}>
           {loading ? <Loader /> : "Submit"}
         </button>
       </form>

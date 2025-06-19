@@ -95,8 +95,8 @@ export default function ClientPanel({ title }) {
   }, [searchQuery, books]);
 
   return (
-    <div className="panel">
-      <div className="heading">
+    <div className="u19 w-full">
+      <div>
         <h1>{title}</h1>
         {/* Show search bar only for "Library" view */}
         {title === "Library" && (
@@ -108,11 +108,11 @@ export default function ClientPanel({ title }) {
         )}
       </div>
       <table>
-        <tbody>
+        <tbody className="flex flex-wrap gap-3">
           {/* Show loader while fetching data */}
           {loading ? (
             Array.from({ length: 8 }).map((_, index) => (
-              <tr key={index}>
+              <tr className="u20" key={index}>
                 <td>
                   <Loader />
                 </td>
@@ -122,7 +122,7 @@ export default function ClientPanel({ title }) {
             // If books are available, map through filtered books and display them
             filteredBooks.length > 0 ? (
               filteredBooks.map(book => (
-                <tr key={book.id} onClick={() => {
+                <tr className="u20" key={book.id} onClick={() => {
                   // If the user is in the "Library" view and the book has a file, set it for playback
                   if (title === "Library" && book.file) {
                     setBookFile(book.file);
@@ -156,12 +156,13 @@ export default function ClientPanel({ title }) {
                 </tr>
               ))
             ):(
-              // If no books are found, show an error message
-              <tr>
-                <td colSpan="1" className="none">
-                  <p>Ups... Book not found.</p>
+              Array.from({ length: 8 }).map((_, index) => (
+              <tr className="u20" key={index}>
+                <td>
+                  <Loader />
                 </td>
               </tr>
+            ))
             )
           )}
         </tbody>

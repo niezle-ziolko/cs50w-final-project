@@ -1,13 +1,3 @@
-.panel {
-  gap: 10px;
-  padding: 2.5em;
-  flex-direction: column;
-  transition: .4s ease-in-out;
-  display: var(--flex-display);
-  border: var(--primary-border);
-  background-color: var(--secondary-color);
-}
-
 .panel.book {
   min-width: 875px;
   max-width: 875px;
@@ -41,10 +31,6 @@
   box-shadow: var(--none-space);
 }
 
-.panel table {
-  width: 875px;
-}
-
 .panel tbody {
   gap: 15px;
   flex-wrap: wrap;
@@ -73,10 +59,7 @@
   transition: .4s ease-in-out;
   display: var(--flex-display);
   max-width: var(--full-space);
-  cursor: var(--pointer-cursor);
   max-height: var(--full-space);
-  border: var(--primary-border);
-  align-items: var(--center-align);
   position: var(--absolute-position);
   justify-content: var(--center-align);
 }

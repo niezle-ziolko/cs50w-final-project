@@ -1,4 +1,4 @@
-.form.edit, .form.create-book {
+.form.create-book {
   width: 24em;
   min-height: 48em;
   align-self: var(--auto-space);
@@ -8,59 +8,6 @@
 .error-message {
   color: #e63946;
   font-weight: bold;
-}
-
-.form.edit .picture {
-  width: 200px;
-  height: 200px;
-  display: flex;
-  border-radius: var(--full-space);
-  align-items: var(--center-align);
-  justify-content: var(--center-align);
-  border: 2px solid var(--primary-color);
-}
-
-.form.edit .box {
-  display: inherit;
-  align-items: var(--center-align);
-  align-items: var(--center-align);
-  justify-content: var(--center-align);
-  justify-content: var(--center-align);
-}
-
-.form.edit .background-icon {
-  z-index: 1;
-  width: 200px;
-  height: 200px;
-  transition: all 0.4s;
-  opacity: var(--null-space);
-  cursor: var(--pointer-cursor);
-  text-align: var(--center-align);
-  border-radius: var(--full-space);
-  position: var(--absolute-position);
-  align-content: var(--center-align);
-  background: rgba(15, 6, 25, 0.40);
-}
-
-.form.edit .background-icon:hover {
-  opacity: 1;
-}
-
-.form.edit #icon {
-  display: flex;
-  color: #e8e8e8;
-  justify-content: var(--center-align);
-}
-
-.form.edit #icon::before {
-  padding: var(--quarter-space);
-  border-radius: var(--full-space);
-  background: rgba(15, 6, 25, .4);
-}
-
-.form.edit .span {
-  font-size: 13px;
-  margin-top: 5px;
 }
 
 .file-upload {

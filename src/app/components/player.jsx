@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Script from "next/script";
 import Link from "next/link";
 
 import { useAudio } from "context/audio-context";
@@ -47,6 +48,7 @@ export default function AudioPlayer({ title }) {
 
   return (
     <div className="player">
+      <Script src="https://cdn.jsdelivr.net/npm/media-chrome@3/+esm" type="module" strategy="afterInteractive" />
       <div className="container">
         <p className="heading">Currently book playing</p>
         
