@@ -95,8 +95,8 @@ export default function EditForm() {
 
         {/* Profile Picture Upload */}
         <div className="relative w-48 h-48 mx-auto cursor-pointer" onClick={handleImageClick}>
-          <img className="w-48 h-48 rounded-full object-cover" src={preview || user?.photo} alt="profile-picture" />
-          <div className="u1 absolute inset-0 bg-black rounded-full opacity-0 hover:opacity-50 transition-opacity z-10">
+          <img className="w-48 h-48 rounded-full object-cover border-2 border-primary" src={preview || user?.photo} alt="profile-picture" />
+          <div className="u1 absolute inset-0 bg-b-100 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10">
             <i className="fa-regular fa-image text-white text-3xl" />
           </div>
           <input

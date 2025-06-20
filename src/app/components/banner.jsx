@@ -79,7 +79,7 @@ export default function Banner() {
               text: "Have anytime, anywhere access to your favorite titles.",
             },
           ].map(({ animation, width, height, title, text }, i) => (
-            <div className="u10 h-63 grid p-6 items-center text-center rounded-lg" key={i}>
+            <div className="u10 h-63 grid p-6 items-center text-center" key={i}>
               <Lottie options={defaultLottieOptions(animation)} width={width} height={height} />
               <h2>{title}</h2>
               <p>{text}</p>
@@ -107,15 +107,15 @@ export default function Banner() {
                 title: "The Lord of the Rings - The Fellowship of the Ring",
               },
             ].map((book, index) => (
-              <div key={index} className="group relative overflow-hidden rounded-lg shadow-md focus:outline-none" tabIndex={0}>
+              <div key={index} className="group relative overflow-hidden rounded-sm shadow-md focus:outline-none" tabIndex={0}>
                 <Image
                   src={book.src}
                   alt={book.title}
                   width={600}
                   height={757}
-                  className="h-auto w-full border-2 rounded-lg object-cover border-primary duration-300 transition-all group-hover:blur-xs group-focus:blur-xs group-active:blur-xs"
+                  className="h-auto w-full border-2 object-cover border-primary duration-300 transition-all group-hover:blur-xs group-focus:blur-xs group-active:blur-xs"
                 />
-                <div className="u1 p-4 absolute inset-0 opacity-0 rounded-lg duration-300 transition-all group-hover:opacity-100 group-focus:opacity-100 group-active:opacity-100">
+                <div className="u1 p-4 absolute inset-0 opacity-0 duration-300 transition-all group-hover:opacity-100 group-focus:opacity-100 group-active:opacity-100">
                   <div className="text-center">
                     <button onClick={() => router.push("/auth/library")}>
                       Listen
@@ -155,13 +155,13 @@ export default function Banner() {
                 author: "Mark",
               },
             ].map((review, index) => (
-              <div key={index} className="p-6 flex border-2 border-primary text-left rounded-lg">
+              <div key={index} className="p-6 flex border-2 border-primary text-left rounded-sm">
                 <Image
                   width={500}
                   height={500}
                   src={review.src}
                   alt={`Avatar of ${review.author}`}
-                  className="h-20 w-20 rounded-lg"
+                  className="h-20 w-20 rounded-sm"
                 />
                 <div className="w-full px-2">
                   <p className="italic mb-1">{review.comment}</p>

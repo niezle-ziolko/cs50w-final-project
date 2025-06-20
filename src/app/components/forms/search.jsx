@@ -2,15 +2,14 @@ import React from "react";
 
 const SearchBar = ({ searchQuery, setSearchQuery }) => {
   return (
-    <div className="search">
+    <div className="u1 mb-5 md:mb-0 w-full md:w-80 justify-end">
       <input
         type="text"
-        className="search"
         value={searchQuery}
         placeholder="Search books..."
         onChange={(e) => setSearchQuery(e.target.value)}
       />
-      <i className="fa-solid fa-magnifying-glass"></i>
+      <i className="fa-solid fa-magnifying-glass absolute mr-3 text-primary" />
     </div>
   );
 };

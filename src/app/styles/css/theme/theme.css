@@ -38,12 +38,6 @@ textarea {
   background-color: var(--secondary-color);
 }
 
-hr {
-  width: var(--full-space);
-  margin: var(--null-space);
-  border: 1px solid var(--primary-color);
-}
-
 textarea {
   resize: none;
   height: 250px;
@@ -55,9 +49,4 @@ textarea {
 
 textarea::placeholder {
   color: var(--primary-color);
-}
-
-.page {
-  gap: 50px;
-  display: var(--flex-display);
 }

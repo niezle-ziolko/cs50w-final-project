@@ -95,13 +95,14 @@ export default function ClientPanel({ title }) {
   }, [searchQuery, books]);
 
   return (
-    <div className="u19 w-full">
-      <div>
+    <div className="u19 w-full p-7">
+      <div className="grid md:flex items-center md:justify-between">
         <h1>{title}</h1>
         {/* Show search bar only for "Library" view */}
         {title === "Library" && (
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         )}
+
         {/* Show info button only for "My books" view */}
         {title === "My books" && (
           <InfoButton />
@@ -136,6 +137,7 @@ export default function ClientPanel({ title }) {
                   <td>
                     {/* Display book picture */}
                     <img src={book.picture} alt={book.title} width="205" height="290" />
+                    
                     {/* Display play icon or like button based on the title */}
                     {title === "Library" || title === "Liked books" ? (
                       <div className="background-icon">
@@ -156,13 +158,11 @@ export default function ClientPanel({ title }) {
                 </tr>
               ))
             ):(
-              Array.from({ length: 8 }).map((_, index) => (
-              <tr className="u20" key={index}>
+              <tr>
                 <td>
-                  <Loader />
+                  <p>Books not found.</p>
                 </td>
               </tr>
-            ))
             )
           )}
         </tbody>
