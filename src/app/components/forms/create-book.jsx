@@ -41,7 +41,7 @@ export default function CreateForm() {
           ...prev,
           [isTextMode ? "textFiles" : "audio"]: [...prev[isTextMode ? "textFiles" : "audio"], ...newFiles],
         }));
-      }
+      };
     } else {
       // Update form data for text inputs
       setFormData((prev) => ({ ...prev, [name]: value }));
@@ -103,7 +103,7 @@ export default function CreateForm() {
   };
 
   return (
-    <div className="form create-book">
+    <div className="form create-book u23">
       <form className="form" style={{ position: "absolute" }} onSubmit={handleSubmit}>
         <p className="heading">Create your book</p>
         <div className="box">

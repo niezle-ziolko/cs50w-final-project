@@ -1,8 +1,6 @@
 .form.create-book {
-  width: 24em;
   min-height: 48em;
   align-self: var(--auto-space);
-  position: var(--relative-position);
 }
 
 .error-message {

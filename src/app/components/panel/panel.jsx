@@ -95,8 +95,8 @@ export default function ClientPanel({ title }) {
   }, [searchQuery, books]);
 
   return (
-    <div className="u19 w-full p-7">
-      <div className="grid md:flex items-center md:justify-between">
+    <div className="u19 w-full p-7 order-2">
+      <div className={`${title === "My books" ? "flex justify-between" : "grid"} md:flex items-center md:justify-between`}>
         <h1>{title}</h1>
         {/* Show search bar only for "Library" view */}
         {title === "Library" && (
@@ -158,9 +158,10 @@ export default function ClientPanel({ title }) {
                 </tr>
               ))
             ):(
+              // If no books are found, show an error message
               <tr>
                 <td>
-                  <p>Books not found.</p>
+                  <p>Ups... Book not found.</p>
                 </td>
               </tr>
             )

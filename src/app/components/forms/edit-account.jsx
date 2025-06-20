@@ -89,7 +89,7 @@ export default function EditForm() {
   const passwordsMatch = !formData.password || formData.password === formData.confirmPassword;
 
   return (
-    <div className="w-full md:w-97 relative">
+    <div className="u23">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <h2 className="text-2xl font-bold mb-8">Edit your data</h2>
 

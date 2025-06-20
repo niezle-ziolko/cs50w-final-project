@@ -170,6 +170,10 @@
   @apply grid md:flex gap-5 md:justify-around;
 }
 
+@utility u23 {
+  @apply w-full md:w-97 min-h-154 relative order-1;
+}
+
 @layer base {
   body {
     @apply max-w-screen m-0 overflow-x-hidden transition-(--transition) bg-secondary font-(family-name:--primary-font-family);
