@@ -5,8 +5,6 @@ import { useAuth } from "context/auth-context";
 import AIIcon from "styles/icons/ai";
 import Loader from "components/loader";
 
-import "styles/css/components/forms.css";
-
 export default function CreateForm() {
   // State to manage form data, loading state, error messages, file names, etc.
   const { updateUser, user } = useAuth();
@@ -103,41 +101,68 @@ export default function CreateForm() {
   };
 
   return (
-    <div className="form create-book u23">
-      <form className="form" style={{ position: "absolute" }} onSubmit={handleSubmit}>
-        <p className="heading">Create your book</p>
-        <div className="box">
+    <div className="u23">
+      <form onSubmit={handleSubmit}>
+        <h2 className="u21">Create your book</h2>
+
+        <div className="w-full">
           {/* File input for audio or text files, depending on mode */}
-          <label className="file-upload">
-            <input 
+          <label className="u25">
+            <p>{isTextMode ? "Choose file (.txt)" : "Choose file (.mp3)"}</p>
+            <input
+              multiple
               type="file" 
-              name="fileUpload" 
-              accept={isTextMode ? "text/plain" : "audio/mp3"} 
-              multiple 
+              name="fileUpload"
+              className="hidden"
               onChange={handleChange} 
+              accept={isTextMode ? "text/plain" : "audio/mp3"} 
             />
-            <span>Select {isTextMode ? "Text Files (.txt)" : "Audio Files (.mp3)"}</span>
+            <span className="hidden">Select {isTextMode ? "Text Files (.txt)" : "Audio Files (.mp3)"}</span>
           </label>
-          <p className="file-name">{fileNames.length > 0 ? fileNames.join(", ") : "No files chosen"}</p>
+          <span className="u24">{fileNames.length > 0 ? fileNames.join(", ") : "No files chosen"}</span>
         </div>
-        <div className="box">
+
+        <div className="w-full">
           {/* File input for image upload */}
-          <label className="file-upload">
-            <input type="file" name="image" accept="image/*" onChange={handleChange} />
-            <span>Select Cover Image</span>
+          <label className="u25">
+            <p>Choose file</p>
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              className="hidden"
+              onChange={handleChange}
+            />
+            <span className="hidden">Select Cover Image</span>
           </label>
-          <p className="file-name">{imageName}</p>
+          <span className="u24">{imageName}</span>
         </div>
+
         {/* Text input for book title */}
-        <input className="input" name="title" placeholder="Title" type="text" value={formData.title} onChange={handleChange} />
+        <input
+          type="text"
+          name="title"
+          placeholder="Title"
+          value={formData.title}
+          onChange={handleChange}
+        />
+
         {/* Textarea for book description */}
-        <textarea name="description" placeholder="Description" value={formData.description} onChange={handleChange} />
+        <textarea
+          name="description"
+          onChange={handleChange}
+          placeholder="Description"
+          value={formData.description}
+        />
+
         {/* Display error message if any */}
-        {error && <p className="error-message">{error}</p>}
+        {error && <p className="u18">{error}</p>}
+        
         {/* Submit button, shows loading indicator when in loading state */}
-        <button className="button" type="submit" disabled={loading}>
+        <button type="submit" disabled={loading}>
           {loading ? <Loader /> : "Submit"}
         </button>
+        
         {/* Toggle between text and audio mode */}
         <AIIcon onClick={() => setIsTextMode((prev) => !prev)} />
       </form>

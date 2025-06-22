@@ -2,8 +2,6 @@
 import ClientPanel from "components/panel/panel";
 import AudioPlayer from "components/player";
 
-import "styles/css/components/forms.css";
-
 export default function MyAccount() {
   const title = "Library";
 

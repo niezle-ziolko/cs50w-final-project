@@ -7,7 +7,7 @@ export default async function Page({ params }) {
   const { id } = await params;
 
   try {
-    const response = await fetch(`https://cs50-final-project-ecz.pages.dev/api/data/book?id=${id}`, {
+    const response = await fetch(`https://echoverse.wgwcompany.workers.dev/api/data/book?id=${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -22,7 +22,7 @@ export default async function Page({ params }) {
     };
 
     return (
-      <div className="page">
+      <div className="u22">
         <BookPanel />
         <AudioPlayer />
       </div>

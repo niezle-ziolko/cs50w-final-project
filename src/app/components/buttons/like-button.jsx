@@ -1,7 +1,7 @@
 "use client";
-import { useAudio } from "context/audio-context";
-import { useAuth } from "context/auth-context";
 import { useState, useEffect } from "react";
+import { useAuth } from "context/auth-context";
+import { useAudio } from "context/audio-context";
 
 export default function LikeButton({ externalBookId }) {
   // Retrieve internal book ID from the audio context and user data from the auth context
@@ -67,8 +67,8 @@ export default function LikeButton({ externalBookId }) {
   };
 
   return (
-    <div className="heart" onClick={handleLike}>
-      <i className="fa-regular fa-heart" style={{ transition: "all .4s", fontWeight: isLiked ? "bold" : "normal" }} />
+    <div className="u1 text-r-100" onClick={handleLike}>
+      <i className={`fa-regular fa-heart ${isLiked ? "before:font-bold" : "before:font-normal"} text-xl cursor-pointer transition-400 transition-all`} />
     </div>
   );
 };

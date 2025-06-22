@@ -28,7 +28,7 @@ export default function InfoButton() {
                     <i className="fa-solid fa-xmark" />
                   </button>
                 </div>
-                <hr className="mb-5 w-full margin-0 border-primary" />
+                <hr />
                 <div className="max-h-100 overflow-scroll md:overflow-hidden overflow-x-hidden">
                   <p className="mb-5">First of all, you need to click on the <strong>&quot;Create with AI&quot;</strong> button, because you will then allow you to upload text files in <strong>.txt</strong> format in the form instead of the finished recording.</p>
                   <p className="mb-5">If you don&apos;t have a self-made <strong>.mp3</strong> file of your audiobook recording, you can use AI technology to create your own audiobook.</p>

@@ -1,15 +1,13 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import { useAudio } from "context/audio-context";
+
 import { useAuth } from "context/auth-context";
+import { useAudio } from "context/audio-context";
 
 import Loader from "../loader";
-import Playing from "../playing";
 import SearchBar from "../forms/search";
 import InfoButton from "../buttons/info-button";
 import LikeButton from "../buttons/like-button";
-
-import "styles/css/components/panel.css";
 
 export default function ClientPanel({ title }) {
   // Access user information from the authentication context
@@ -95,7 +93,7 @@ export default function ClientPanel({ title }) {
   }, [searchQuery, books]);
 
   return (
-    <div className="u19 w-full p-7 order-2">
+    <div className="u19 w-full p-7 order-2 md:roder-1">
       <div className={`${title === "My books" ? "flex justify-between" : "grid"} md:flex items-center md:justify-between`}>
         <h1>{title}</h1>
         {/* Show search bar only for "Library" view */}
@@ -136,22 +134,24 @@ export default function ClientPanel({ title }) {
                 }}>
                   <td>
                     {/* Display book picture */}
-                    <img src={book.picture} alt={book.title} width="205" height="290" />
+                    <img className="w-full md:w-50 h-full md:h-71" src={book.picture} alt={book.title} width="200" height="280" />
                     
                     {/* Display play icon or like button based on the title */}
                     {title === "Library" || title === "Liked books" ? (
-                      <div className="background-icon">
-                        {title === "Library" ? (
-                          // Show "Playing" if the current book is the one being played
-                          bookId === book.id ? (
-                            <Playing />
+                      <div className="u1 u26">
+                        <div className="w-15 h-15 p-5 bg-b-100 rounded-full">
+                          {title === "Library" ? (
+                            // Show "Playing" if the current book is the one being played
+                            bookId === book.id ? (
+                              <i className="fa-solid fa-music text-white text-xl" id="icon" />
+                            ) : (
+                              <i className="fa-solid fa-play text-white text-xl" id="icon" />
+                            )
                           ) : (
-                            <i className="fa-solid fa-play" id="icon" />
-                          )
-                        ) : (
-                          // Show like button for liked books
-                          <LikeButton externalBookId={book.id} />
-                        )}
+                            // Show like button for liked books
+                            <LikeButton externalBookId={book.id} />
+                          )}
+                        </div>
                       </div>
                     ) : null}
                   </td>

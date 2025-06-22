@@ -1,8 +1,6 @@
 "use client";
 import { useAudio } from "context/audio-context";
 
-import "styles/css/components/panel.css";
-
 export default function BookPanel() {
   const { bookTitle, bookAuthor, bookDescription, bookFile } = useAudio();
 
@@ -12,13 +10,13 @@ export default function BookPanel() {
   })) : [];
 
   return (
-    <div className="panel book">
+    <div className="u19 w-full p-7 order-2 md:roder-1">
       <h1>{bookTitle}</h1>
       <hr />
       <h2>Author: {bookAuthor}</h2>
       <p>{bookDescription}</p>
       <h2>Chapters:</h2>
-      <div className="chapters">
+      <div className="h-25 grid overflow-y-auto overflow-x-hidden">
         {chapters.length > 0 ? (
           chapters.map((chapter) => (
             <li key={chapter.number}>

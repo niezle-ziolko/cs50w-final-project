@@ -56,7 +56,7 @@ export default function NavMenu() {
       </ul>
       <div>
         <label className="relative cursor-pointer inline-block w-11 h-7 align-middle select-none" aria-label="switch-theme">
-          <input type="checkbox" checked={isDarkMode} onChange={() => setIsDarkMode(!isDarkMode)} className="sr-only peer" />
+          <input name="theme-button" type="checkbox" checked={isDarkMode} onChange={() => setIsDarkMode(!isDarkMode)} className="sr-only peer" />
           <div className="w-full h-4 bg-secondary rounded-full border-2 border-primary" />
           <div className="absolute left-s bottom-2 w-4 h-4 bg-secondary rounded-full border-2 border-primary transition transform peer-checked:translate-x-4 peer-hover:translate-y-[-1px] shadow-[0_2px_0_0_var(--color-primary)]" />
         </label>

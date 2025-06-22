@@ -1,6 +1,8 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+
 import { useAuth } from "context/auth-context";
+
 import Loader from "components/loader";
 
 export default function EditForm() {
@@ -90,14 +92,16 @@ export default function EditForm() {
 
   return (
     <div className="u23">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <h2 className="text-2xl font-bold mb-8">Edit your data</h2>
+      <form onSubmit={handleSubmit}>
+        <h2 className="u21">Edit your data</h2>
 
         {/* Profile Picture Upload */}
         <div className="relative w-48 h-48 mx-auto cursor-pointer" onClick={handleImageClick}>
           <img className="w-48 h-48 rounded-full object-cover border-2 border-primary" src={preview || user?.photo} alt="profile-picture" />
-          <div className="u1 absolute inset-0 bg-b-100 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10">
-            <i className="fa-regular fa-image text-white text-3xl" />
+          <div className="u1 u26 rounded-full">
+            <div className="w-15 h-15 p-5 bg-b-100 rounded-full">
+              <i className="fa-regular fa-image text-white text-xl" />
+            </div>
           </div>
           <input
             type="file"
@@ -136,7 +140,7 @@ export default function EditForm() {
         />
 
         {/* Info Text */}
-        <span>Enter only the data you want to change.</span>
+        <span className="u24">Enter only the data you want to change.</span>
 
         {/* Error Message */}
         {error && <p className="u18">{error}</p>}
