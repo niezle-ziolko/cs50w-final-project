@@ -3,23 +3,20 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @variant dark {
-  --color-primary: oklch(0.9018 0.0383 31.95);
-  --color-secondary: oklch(0.4069 0.1117 250.59);
-  --color-third: oklch(0.8113 0.1029 216.34);
+  --color-primary: oklch(1 0 0);
+  --color-secondary: oklch(0 0 0);
 }
 
 @theme {
-  --color-primary: oklch(0.4069 0.1117 250.59);
-  --color-secondary: oklch(0.9018 0.0383 31.95);
-  --color-third: oklch(0.4142 0.189163 329.6065);
+  --color-primary: oklch(0 0 0);
+  --color-secondary: oklch(1 0 0);
+  --color-third: oklch(0.5938 0.152 247.38);
 
   --color-b-100: oklch(0.1491 0.0421 304.41 / 40%);
   --color-b-200: oklch(0.329 0 0);
   --color-b-300: oklch(0.2046 0 0);
 
-  --color-r-100: oklch(52.74% 0.1751 25.55);
-
-  --color-y-100: oklch(0.8694 0.3325 101.4);
+  --color-r-100: oklch(0.5618 0.2087 27.26);
 
   --color-g-100: oklch(0.931 0 0);
   --color-g-200: oklch(0.6764 0 0);
@@ -377,14 +374,14 @@
 }
 
 @utility u28 {
-  @apply text-primary bg-transparent font-(family-name:--secondary-font-family);
+  @apply text-third bg-transparent font-(family-name:--secondary-font-family);
 }
 
 @utility u29 {
   --media-range-thumb-width: 1rem;
   --media-range-thumb-height: 1rem;
   background: var(--transparent-color);
-  --media-range-bar-color: var(--color-primary);
+  --media-range-bar-color: var(--color-third);
   --media-range-thumb-color: var(--color-primary);
   --media-range-thumb-background: var(--color-primary);
 }
@@ -453,41 +450,12 @@
   }
 
   button {
-    @apply u1 u10 w-full h-11 py-2 px-6 text-primary text-base font-bold cursor-pointer bg-secondary text-black font-(family-name:--secondary-font-family);
+    @apply u1 u10 w-full h-11 py-2 px-6 text-primary text-base font-bold cursor-pointer bg-third text-black font-(family-name:--secondary-font-family);
   }
 }
 
 @layer components {
   .loader-bar {
     @apply w-[35%] h-[65%] absolute bg-primary animate-loader;
-  }
-
-  .media-play-button,
-  .media-seek-forward-button,
-  .media-seek-backward-button {
-    width: 50px;
-    margin: 10px;
-    padding: 10px;
-    transition: all 0.4s;
-    color: var(--primary-color);
-    border: var(--primary-border);
-    font-size: var(--quarter-space);
-    border-radius: var(--full-space);
-    background-color: var(--transparent-color);
-  }
-
-  .media-play-button:hover,
-  .media-seek-forward-button:hover,
-  .media-seek-backward-button:hover {
-    color: var(--secondary-theme-color);
-    border: 2px solid var(--secondary-theme-color);
-  }
-
-  .media-mute-button {
-    width: 16px;
-    padding: 0px;
-    font-size: 14px;
-    color: var(--primary-color);
-    background-color: var(--transparent-color);
   }
 }
