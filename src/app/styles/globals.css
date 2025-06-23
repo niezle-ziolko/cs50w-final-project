@@ -382,8 +382,8 @@
   --media-range-thumb-height: 1rem;
   background: var(--transparent-color);
   --media-range-bar-color: var(--color-third);
-  --media-range-thumb-color: var(--color-primary);
-  --media-range-thumb-background: var(--color-primary);
+  --media-range-thumb-color: var(--color-third);
+  --media-range-thumb-background: var(--color-third);
 }
 
 @utility u30 {
