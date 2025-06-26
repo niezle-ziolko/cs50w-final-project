@@ -106,7 +106,7 @@ export default function AudioPlayer({ title }) {
           {chapters.length > 0 ? (
             chapters.map((chapter, index) => {
               const isActive = chapter.number === currentChapterNumber;
-              const baseClass = "bg-transparent hover:shadow-none hover:transform-none active:shadow-none active:transform-none";
+              const baseClass = "text-primary bg-transparent hover:shadow-none hover:transform-none active:shadow-none active:transform-none";
               const activeClass = isActive ? " text-third border-third" : "";
 
               return (

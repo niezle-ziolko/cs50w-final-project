@@ -100,6 +100,8 @@ export default function CreateForm() {
     };
   };
 
+  const color = "black";
+
   return (
     <div className="u23">
       <form onSubmit={handleSubmit}>
@@ -160,7 +162,7 @@ export default function CreateForm() {
         
         {/* Submit button, shows loading indicator when in loading state */}
         <button type="submit" disabled={loading}>
-          {loading ? <Loader /> : "Submit"}
+          {loading ? <Loader color={color} /> : "Submit"}
         </button>
         
         {/* Toggle between text and audio mode */}

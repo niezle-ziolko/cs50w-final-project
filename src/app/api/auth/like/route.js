@@ -2,14 +2,6 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { bearerHeaders } from "utils/headers";
 
 export async function POST(request) {
-  // Get environment variables from the request context
-  const { env } = await getCloudflareContext({ async: true });
-  const authToken = env.CLIENT_AUTH;
-  
-  // Validate the request using the Bearer token
-  const authResponse = bearerHeaders(request, authToken);
-  if (authResponse) return authResponse; // If authentication fails, return the response and stop execution
-
   let requestBody;
   try {
     // Parse the incoming JSON request body
@@ -187,4 +179,3 @@ export async function DELETE(request) {
     });
   };
 };
-

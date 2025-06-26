@@ -36,6 +36,8 @@
         }
     ],
     "vars": {
+        "JWT_SECRET": "0joBg09Ui2ykIacUW1iB8fi8kQRS3NQR",
+        "NEXT_PUBLIC_JWT_SECRET": "0joBg09Ui2ykIacUW1iB8fi8kQRS3NQR",
         "BOOK_AUTH": "aGVCzBMZvmaIujfzlLovQGPuB93E1eId",
         "NEXT_PUBLIC_BOOK_AUTH": "aGVCzBMZvmaIujfzlLovQGPuB93E1eId",
         "CLIENT_AUTH": "ZE8RhKKIQC2G9xPHVe9FNtodUn9s9wD1",
@@ -43,10 +45,12 @@
         "CHALLENGE_AUTH": "7ZBHsuVUw39nwVDCMgEBjPl3IsJ0rMEO",
         "NEXT_PUBLIC_CHALLENGE_AUTH": "7ZBHsuVUw39nwVDCMgEBjPl3IsJ0rMEO",
         "CHALLENGE_SECRET": "0x4AAAAAAA8Cypo9aDiDt4r2F23lLNjpoZs",
+        "SECRET_KEY": "0x4AAAAAAA8Cypo9aDiDt4r2F23lLNjpoZs",
         "NEXT_PUBLIC_HASH_KEY": "sUla2TxcisLRwNMLb1zeW9n7Wm5t9d7p",
         "CRYPTO_KEY": "sUla2TxcisLRwNMLb1zeW9n7Wm5t9d7p",
+        "SITE_KEY": "0x4AAAAAAA8CytbRsD_4tmim",
         "NEXT_PUBLIC_SITE_KEY": "0x4AAAAAAA8CytbRsD_4tmim",
 	    "NODE_VERSION": "24.1.0",
-        "PNPM_VERSION": "10.12.1"
+        "PNPM_VERSION": "10.12.2"
 	}
 }

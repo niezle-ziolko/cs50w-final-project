@@ -117,7 +117,7 @@ export default function Banner() {
                 />
                 <div className="u1 p-4 absolute inset-0 opacity-0 duration-300 transition-all group-hover:opacity-100 group-focus:opacity-100 group-active:opacity-100">
                   <div className="text-center">
-                    <button onClick={() => router.push("/auth/library")}>
+                    <button className="text-black border-black hover:shadow-[var(--spacing-s)_var(--spacing-s)_0px_black] hover:transform-(--transform) transition-(--transition)" onClick={() => router.push("/auth/library")}>
                       Listen
                     </button>
                   </div>
