@@ -7,7 +7,7 @@ import { decryptUser } from "../../utils";
 import { useAuth } from "context/auth-context";
 import { useTheme } from "context/theme-context";
 import { LOGIN_MUTATION } from "client/mutations";
-import { createApolloClient } from "client/client";
+import { apolloClient } from "client/client";
 
 import Loader from "components/loader";
 
@@ -48,7 +48,7 @@ export default function SignInForm() {
         return;
       };
 
-      const client = createApolloClient(turnstileToken);
+      const client = apolloClient(turnstileToken);
 
       const { data } = await client.mutate({
         mutation: LOGIN_MUTATION,

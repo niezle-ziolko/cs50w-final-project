@@ -1,3 +1,7 @@
+import { GraphQLError } from "graphql";
+
+import { verifyJWT } from "./utils";
+
 export function bearerHeaders(request, authToken) {
   const authorizationHeader = request.headers.get("Authorization");
 
@@ -9,13 +13,6 @@ export function bearerHeaders(request, authToken) {
   };
 
   return null;
-};
-
-export function corsHeaders() {
-  return {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"
-  };
 };
 
 export async function bearerHeader(auth, clientIps, env){
@@ -53,8 +50,28 @@ export async function bearerHeader(auth, clientIps, env){
   // Parse the API response as JSON
   const response = await result.json();
   console.log(response); // Debugging the response
+};
 
-  if (response.success !== true) {
-    throw new Error("Turnstile token has already been used or timeout.");
+/**
+ * Helper function to authenticate user from JWT token
+ */
+export async function authenticateHeader(authHeader) {
+  if (!authHeader) {
+    throw new GraphQLError("Authentication token required", { extensions: { code: "UNAUTHENTICATED" } });
+  };
+
+  // Extract token from "Bearer <token>" format
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
+  
+  if (!token) {
+    throw new GraphQLError("Invalid authorization header format", { extensions: { code: "UNAUTHENTICATED" } });
+  };
+
+  try {
+    const userData = await verifyJWT(token);
+
+    return userData;
+  } catch (error) {
+    throw new GraphQLError("Invalid or expired token", { extensions: { code: "UNAUTHENTICATED" } });
   };
 };

@@ -23,3 +23,19 @@ export const UPDATE_MUTATION = gql`
     }
   }
 `;
+
+export const LIKE_MUTATION = gql`
+  mutation Mutation($bookId: ID!, $userId: ID!) {
+    addLike(bookId: $bookId, userId: $userId) {
+      data
+    }
+  }
+`;
+
+export const UNLIKE_MUTATION = gql`
+  mutation Mutation($bookId: ID!, $userId: ID!) {
+    removeLike(bookId: $bookId, userId: $userId) {
+      data
+    }
+  }
+`;

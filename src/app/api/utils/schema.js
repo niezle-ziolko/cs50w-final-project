@@ -1,4 +1,15 @@
-export const typeDefs = `
+export const typeDefs = `  
+  type Book {
+    id: ID!
+    title: String!
+    description: String!
+    author: String!
+    picture: String!
+    file: String!
+    date: String!
+    ai: Boolean!
+  }
+
   type User {
     id: ID!
     username: String!
@@ -16,6 +27,7 @@ export const typeDefs = `
 
   type Query {
     me(credentials: LoginCredentials!): User
+    books(id: ID): [Book!]!
   }
 
   input LoginCredentials {
@@ -30,7 +42,6 @@ export const typeDefs = `
   }
 
   input UpdateUserInput {
-    username: String!
     email: String
     password: String
     photo: String
@@ -41,8 +52,10 @@ export const typeDefs = `
   }
 
   type Mutation {
-    registerUser(credentials: RegisterInput!): TokenResponse!
-    updateUser(credentials: UpdateUserInput!): TokenResponse
     loginUser(credentials: LoginCredentials!): TokenResponse!
+    registerUser(credentials: RegisterInput!): TokenResponse!
+    updateUser(credentials: UpdateUserInput!): TokenResponse!
+    addLike(bookId: ID!, userId: ID!): TokenResponse!
+    removeLike(bookId: ID!, userId: ID!): TokenResponse!
   }
 `;

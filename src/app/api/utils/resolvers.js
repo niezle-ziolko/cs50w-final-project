@@ -1,17 +1,42 @@
 import { v4 as uuidv4 } from "uuid";
 import { GraphQLError } from "graphql";
 
-import { bearerHeader } from "./headers";
-import { signJWT, hashPassword, authenticateUser } from "./utils";
+import { bearerHeader, authenticateHeader } from "./headers";
+import { signJWT, hashPassword } from "./utils";
 
 export const resolvers = {
   Query: {
+    books: async (_, { id }, context) => {
+      const { db, auth } = context;
+        
+      // Authenticate user using JWT token
+      await authenticateHeader(auth);
+
+      if (!id) {
+        const result = await db.prepare("SELECT * FROM books").all();
+
+        if (!result?.results?.length) {
+          throw new Error("No books found");
+        };
+
+        return result.results;
+      };
+
+      const result = await db.prepare("SELECT * FROM books WHERE id = ?").bind(id).first();
+
+      if (!result) {
+        throw new Error("Book not found");
+      };
+
+      return [result];
+    },
+
     me: async (_, args, context) => {
       try {
         const { db, auth } = context;
         
         // Authenticate user using JWT token
-        const userData = await authenticateUser(auth);
+        const userData = await authenticateHeader(auth);
         
         // Retrieve fresh user information from the database
         const result = await db.prepare("SELECT * FROM users WHERE id = ?").bind(userData.id).first();
@@ -120,7 +145,7 @@ export const resolvers = {
         // Generate a unique UUID for the new message
         const userId = uuidv4();
         const hashedPassword = await hashPassword(password);
-        const defaultPhotoUrl = "https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/final-project/profile-photo/default-profile-picture.webp";
+        const defaultPhotoUrl = "https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/images/users/default-profile-picture.webp";
         
         // Insert new user into database
         await db.prepare("INSERT INTO users (id, username, email, password, photo) VALUES (?, ?, ?, ?, ?)").bind(userId, username, email, hashedPassword, defaultPhotoUrl).run();
@@ -159,12 +184,12 @@ export const resolvers = {
 
     updateUser: async (_, { credentials }, context) => {
       try {
-        const { db, auth, env } = context; // Dodajemy env do context
+        const { db, auth, env } = context;
 
         // Authenticate user using JWT token
-        const authenticatedUser = await authenticateUser(auth);
+        const authenticatedUser = await authenticateHeader(auth);
     
-        const { username, email, password, confirmPassword, photo } = credentials;
+        const { username, email, password, photo } = credentials;
 
         // Use authenticated user"s username if not provided in input
         const targetUsername = username || authenticatedUser.username;
@@ -176,9 +201,7 @@ export const resolvers = {
 
         // Check if authenticated user is trying to update their own profile
         if (targetUsername !== authenticatedUser.username) {
-          throw new GraphQLError("You can only update your own profile", { 
-            extensions: { code: "FORBIDDEN" } 
-          });
+          throw new GraphQLError("You can only update your own profile", { extensions: { code: "FORBIDDEN" } });
         };
 
         const user = await db.prepare("SELECT * FROM users WHERE username = ?").bind(targetUsername).first();
@@ -205,11 +228,6 @@ export const resolvers = {
           params.push(email);
         };
 
-        // Check for password updates
-        if (password && password !== confirmPassword) {
-          throw new GraphQLError("Passwords do not match", { extensions: { code: "BAD_USER_INPUT" } });
-        };
-
         if (password) {
           const hashedPassword = await hashPassword(password);
           updates.push("password = ?");
@@ -219,12 +237,7 @@ export const resolvers = {
         // Handle photo upload to R2
         let photoUrl = user.photo; // Keep existing photo by default
     
-        if (photo) {
-          console.log("🔍 Starting photo upload process");
-          console.log("Photo type:", typeof photo);
-          console.log("Photo starts with data:image:", photo.startsWith("data:image/"));
-          console.log("Photo preview:", photo.substring(0, 100));
-      
+        if (photo) {      
           try {
             // Validate if photo is a valid base64 image
             let imageData;
@@ -232,97 +245,70 @@ export const resolvers = {
             let fileExtension;
         
             if (typeof photo === "string" && photo.startsWith("data:image/")) {
-              console.log("✅ Photo is valid base64 string");
           
               // Handle base64 encoded image
               const matches = photo.match(/^data:image\/([a-zA-Z0-9]+);base64,(.*)$/);
-              console.log("Regex matches:", matches ? matches.length : "null");
           
               if (!matches || matches.length !== 3) {
-                console.log("❌ Invalid base64 format");
                 throw new GraphQLError("Invalid base64 image format", { extensions: { code: "BAD_USER_INPUT" } });
               };
           
               mimeType = `image/${matches[1]}`;
               fileExtension = matches[1] === "jpeg" ? "jpg" : matches[1];
           
-              console.log("📋 Image details:", { mimeType, fileExtension });
-          
               try {
                 imageData = new Uint8Array(Buffer.from(matches[2], "base64"));
-                console.log("✅ Buffer created successfully, size:", imageData.length);
               } catch (bufferError) {
-                console.log("❌ Buffer creation failed:", bufferError);
                 throw new GraphQLError("Invalid base64 data", { extensions: { code: "BAD_USER_INPUT" } });
               };
             } else {
-              console.log("❌ Photo is not a valid base64 string");
               throw new GraphQLError("Photo must be a base64 encoded image", { extensions: { code: "BAD_USER_INPUT" } });
             };
 
             // Validate image type
             const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
             if (!allowedTypes.includes(mimeType)) {
-              console.log("❌ Unsupported image type:", mimeType);
-              throw new GraphQLError("Unsupported image format. Allowed: JPEG, PNG, WebP", { 
-                extensions: { code: "BAD_USER_INPUT" } 
-              });
+              throw new GraphQLError("Unsupported image format. Allowed: JPEG, PNG, WebP", { extensions: { code: "BAD_USER_INPUT" } });
             };
-            console.log("✅ Image type is supported");
 
             // Validate image size (max 10MB for base64)
             if (imageData.length > 10 * 1024 * 1024) {
-              console.log("❌ Image too large:", imageData.length);
-              throw new GraphQLError("Image too large. Maximum size: 10MB", { 
-                extensions: { code: "BAD_USER_INPUT" } 
-              });
+              throw new GraphQLError("Image too large. Maximum size: 10MB", { extensions: { code: "BAD_USER_INPUT" } });
             };
-            console.log("✅ Image size is acceptable");
 
             // Generate unique filename
-            const timestamp = Date.now();
-            const randomString = Math.random().toString(36).substring(2, 15);
-            const fileName = `${targetUsername}_${timestamp}_${randomString}.${fileExtension}`;
+            const randomString = uuidv4();
+            const fileName = `${randomString}.${fileExtension}`;
             const imageKey = `images/users/${fileName}`;
-        
-            console.log("📁 Generated file path:", imageKey);
+
 
             // Upload to Cloudflare R2
             if (!env?.R2) {
-              console.log("❌ R2 not available in env");
               throw new GraphQLError("R2 storage not configured", { extensions: { code: "INTERNAL_ERROR" } });
             };
-            console.log("✅ R2 is available");
 
-            console.log("🚀 Starting R2 upload...");
-            const uploadResult = await env.R2.put(imageKey, imageData, {
+            await env.R2.put(imageKey, imageData, {
               httpMetadata: {
                 contentType: mimeType,
               },
             });
 
-            console.log("📤 Upload result:", uploadResult);
-
             // Generate public URL
             photoUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${imageKey}`;
-            console.log("🔗 Generated photo URL:", photoUrl);
 
             // If user had an old photo, optionally delete it from R2
             if (user.photo && user.photo.startsWith("https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/")) {
               const oldKey = user.photo.replace("https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/", "");
-              console.log("🗑️ Attempting to delete old photo:", oldKey);
+
               try {
                 await env.R2.delete(oldKey);
-                console.log("✅ Old photo deleted successfully");
               } catch (deleteError) {
-                console.warn("⚠️ Failed to delete old photo:", deleteError);
+                console.warn("Failed to delete old photo:", deleteError);
               };
             };
 
-            console.log("🎉 Photo upload completed successfully");
-
           } catch (uploadError) {
-            console.error("💥 Photo upload error details:", {
+            console.error("Photo upload error details:", {
               message: uploadError.message,
               stack: uploadError.stack,
               name: uploadError.name,
@@ -332,9 +318,8 @@ export const resolvers = {
             if (uploadError instanceof GraphQLError) {
               throw uploadError;
             };
-            throw new GraphQLError(`Photo upload failed: ${uploadError.message}`, { 
-              extensions: { code: "INTERNAL_ERROR" } 
-            });
+
+            throw new GraphQLError(`Photo upload failed: ${uploadError.message}`, { extensions: { code: "INTERNAL_ERROR" } });
           };
         };
 
@@ -376,6 +361,89 @@ export const resolvers = {
 
         throw new GraphQLError(error.message, { extensions: { code: "INTERNAL_ERROR" } });
       };
+    },
+
+    addLike: async (_, args, context) => {
+      const { bookId, userId } = args;
+      const { db, auth, ip, env } = context;
+
+      // Authenticate user using JWT token
+      await authenticateHeader(auth, ip, env);
+
+      const userQuery = await db.prepare("SELECT liked FROM users WHERE id = ?").bind(userId).first();
+      if (!userQuery) throw new Error("User not found.");
+
+      const likedArray = userQuery.liked ? userQuery.liked.split(",").map(item => item.trim()) : [];
+
+      if (likedArray.includes(bookId.toString())) {
+        throw new Error("Like has already been added.");
+      };
+
+      likedArray.push(bookId.toString());
+      const updatedLiked = likedArray.join(", ");
+
+      await db.prepare("UPDATE users SET liked = ? WHERE id = ?").bind(updatedLiked, userId).run();
+
+      const result = await db.prepare("SELECT * FROM users WHERE id = ?").bind(userId).first();
+      if (!result) throw new Error("Updated user not found.");
+
+      const userData = {
+        id: result.id,
+        username: result.username,
+        email: result.email,
+        photo: result.photo,
+        created: result.created,
+        currently: result.currently,
+        liked: result.liked,
+        expiresDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
+      };
+
+      // Sign the message data payload into a JWT token
+      const token = await signJWT(userData);
+
+      // Return the JWT token containing the message information
+      return { data: token };
+    },
+
+    removeLike: async (_, args, context) => {
+      const { bookId, userId } = args;
+      const { db, auth, ip, env } = context;
+
+      // Authenticate user using JWT token
+      await authenticateHeader(auth, ip, env);
+
+      const userQuery = await db.prepare("SELECT liked FROM users WHERE id = ?").bind(userId).first();
+      if (!userQuery) throw new Error("User not found.");
+
+      const likedArray = userQuery.liked ? userQuery.liked.split(",").map(item => item.trim()).filter(likedId => likedId !== bookId.toString()) : [];
+
+      if (likedArray.length === userQuery.liked.split(",").length) {
+        throw new Error("Book not found in liked.");
+      }
+
+      const updatedLiked = likedArray.join(", ");
+
+      await db.prepare("UPDATE users SET liked = ? WHERE id = ?").bind(updatedLiked, userId).run();
+
+      const result = await db.prepare("SELECT * FROM users WHERE id = ?").bind(userId).first();
+      if (!result) throw new Error("Updated user not found.");
+
+      const userData = {
+        id: result.id,
+        username: result.username,
+        email: result.email,
+        photo: result.photo,
+        created: result.created,
+        currently: result.currently,
+        liked: result.liked,
+        expiresDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
+      };
+
+      // Sign the message data payload into a JWT token
+      const token = await signJWT(userData);
+
+      // Return the JWT token containing the message information
+      return { data: token };
     }
   }
 };

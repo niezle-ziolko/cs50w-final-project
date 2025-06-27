@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 
 // Function to create a new Apollo Client instance with optional auth token
-export const createApolloClient = (token) => {
+export const apolloClient = (token) => {
   // Create an HTTP link to the GraphQL endpoint
   const httpLink = createHttpLink({
     uri: "/api/h57oBNgFRK" // GraphQL server endpoint

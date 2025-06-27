@@ -19,7 +19,7 @@ export default function Header() {
             </Link>
           </div>
           {user && user.photo ? (
-            <img className="hidden md:block rounded-full border-primary border-2" src={user.photo} alt="profile-picture" width="70" height="70" />
+            <img className="w-17 h-17 hidden md:block rounded-full border-primary border-2" src={user.photo} alt="profile-picture" width="70" height="70" />
           ) : null}
         </div>
         <div className="u11">

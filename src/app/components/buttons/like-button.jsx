@@ -1,7 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
+
+import { decryptUser } from "../../utils";
 import { useAuth } from "context/auth-context";
 import { useAudio } from "context/audio-context";
+import { apolloClient } from "client/client";
+import { LIKE_MUTATION, UNLIKE_MUTATION } from "client/mutations";
 
 export default function LikeButton({ externalBookId }) {
   // Retrieve internal book ID from the audio context and user data from the auth context
@@ -32,31 +36,29 @@ export default function LikeButton({ externalBookId }) {
 
     try {
       // Determine the method based on whether the book is liked or not
-      const method = isLiked ? "DELETE" : "POST";
-      
-      // Send the like/unlike request to the server
-      const response = await fetch("/api/auth/like", {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_CLIENT_AUTH}`
-        },
-        body: JSON.stringify({
-          id: bookId,
-          username: user.username
-        })
+      const method = isLiked ? UNLIKE_MUTATION : LIKE_MUTATION;
+
+      const auth = window.localStorage.getItem("token");
+      const client = apolloClient(auth);
+          
+      const { data } = await client.mutate({
+        mutation: method,
+        variables: {
+          bookId: bookId,
+          userId: user.id
+        }
       });
 
-      // If response is not ok, log error and return
-      if (!response.ok) {
-        console.error(`error: ${response.status} ${response.statusText}`);
-        return;
-      };
+      const token = data?.addLike?.data || data?.removeLike?.data;
 
-      // Parse the response and update user data
-      const data = await response.json();
-      updateUser(data);
+      if (!token) {
+        throw new Error("No like data returned from server.");
+      };
       
+      // Decrypt and update user data
+      const userData = await decryptUser(token);
+      updateUser(userData);
+
       // Toggle the liked state and log success message
       setIsLiked(!isLiked);
       console.log(`Book ${isLiked ? "unliked" : "liked"} successfully`);

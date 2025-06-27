@@ -1,4 +1,3 @@
-import { GraphQLError } from "graphql";
 import { SignJWT, jwtVerify } from "jose";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
@@ -49,30 +48,6 @@ export async function verifyJWT(token) {
     };
 
     throw new Error(`Invalid token: ${error.message}`);
-  };
-};
-
-/**
- * Helper function to authenticate user from JWT token
- */
-export async function authenticateUser(authHeader) {
-  if (!authHeader) {
-    throw new GraphQLError("Authentication token required", { extensions: { code: "UNAUTHENTICATED" } });
-  };
-
-  // Extract token from "Bearer <token>" format
-  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
-  
-  if (!token) {
-    throw new GraphQLError("Invalid authorization header format", { extensions: { code: "UNAUTHENTICATED" } });
-  };
-
-  try {
-    const userData = await verifyJWT(token);
-
-    return userData;
-  } catch (error) {
-    throw new GraphQLError("Invalid or expired token", { extensions: { code: "UNAUTHENTICATED" } });
   };
 };
 

@@ -9,7 +9,8 @@ CREATE TABLE books (
   picture TEXT NOT NULL,
   file TEXT,
   date TEXT,
-  liked TEXT
+  liked TEXT,
+  ai BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE users (
@@ -30,7 +31,8 @@ INSERT INTO books (
   author,
   picture,
   file,
-  date
+  date,
+  ai
 ) VALUES (
   'e65255e5-f382-4a32-ba44-9add9e0a9cd9',
   'The Torrents of Spring',
@@ -38,7 +40,8 @@ INSERT INTO books (
   'Kevin',
   'https://cdn.niezleziolko.app/final-project/book-picture/e65255e5-f382-4a32-ba44-9add9e0a9cd9.webp',
   'https://cdn.niezleziolko.app/final-project/book-file/e65255e5-f382-4a32-ba44-9add9e0a9cd9-1.mp3,https://cdn.niezleziolko.app/final-project/book-file/e65255e5-f382-4a32-ba44-9add9e0a9cd9-2.mp3,https://cdn.niezleziolko.app/final-project/book-file/e65255e5-f382-4a32-ba44-9add9e0a9cd9-3.mp3,https://cdn.niezleziolko.app/final-project/book-file/e65255e5-f382-4a32-ba44-9add9e0a9cd9-4.mp3',
-  '2025-03-04T11:42:08.204Z'
+  '2025-03-04T11:42:08.204Z',
+  FALSE
 );
 
 INSERT INTO users (

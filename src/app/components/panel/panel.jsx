@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 
+import { BOOK_QUERY, BOOKS_QUERY } from "client/query";
+import { apolloClient } from "client/client";
 import { useAuth } from "context/auth-context";
 import { useAudio } from "context/audio-context";
 
@@ -21,56 +23,59 @@ export default function ClientPanel({ title }) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch books based on the user"s status and the current view title ("Library", "My books", "Liked books")
   const fetchBooks = useCallback(async () => {
-    if (!user) return; // Exit early if there is no user
+    if (!user) return;
 
-    setLoading(true); // Set loading state while fetching data
+    setLoading(true);
 
     try {
-      let responses = [];
-      const headers = { "Authorization": `Bearer ${process.env.NEXT_PUBLIC_BOOK_AUTH}` };
+      const token = localStorage.getItem("token");
+      const client = apolloClient(token);
 
-      // Fetch different data based on the "title" (Library, My books, or Liked books)
+      let booksData = [];
+
       if (title === "Library") {
-        const response = await fetch("/api/data/book", { headers });
-        responses = await response.json();
+        const { data } = await client.query({
+          query: BOOKS_QUERY
+        });
+
+        booksData = data.books;
       } else {
+      // My Books / Liked Books
         let ids = [];
         if (title === "My books" && user?.created) {
-          // If the user is viewing their created books, get book IDs from the "created" field
-          ids = user.created.split(", ").map(id => id.trim());
+          ids = user.created.split(",").map(id => id.trim());
         } else if (title === "Liked books" && user?.liked) {
-          // If the user is viewing liked books, get book IDs from the "liked" field
-          ids = user.liked.split(", ").map(id => id.trim());
+          ids = user.liked.split(",").map(id => id.trim());
         };
 
-        // Fetch the books by their IDs if there are any
         if (ids.length) {
-          responses = await Promise.all(
-            ids.map(id =>
-              fetch(`/api/data/book?id=${id}`, { headers }).then(res => res.json())
-            )
+          const results = await Promise.all(
+            ids.map(async (id) => {
+              const { data } = await client.query({
+                query: BOOK_QUERY,
+                variables: { id }
+              });
+
+              return data.books?.[0]; // `books(id)` also returns an array
+            })
           );
+
+          booksData = results.filter(Boolean);
         };
       };
 
-      // Filter and format the books (only including those with pictures and optionally a file)
-      const formattedBooks = responses
-        .filter(book => book?.picture)
-        .map(book => ({
-          ...book,
-          file: book?.file || null
-        }));
+      const formattedBooks = booksData.filter(book => book?.picture).map(book => ({ ...book, file: book?.file || null }));
 
-      setBooks(formattedBooks); // Set the fetched books
-      setFilteredBooks(formattedBooks); // Set the filtered books for search functionality
+      setBooks(formattedBooks);
+      setFilteredBooks(formattedBooks);
     } catch (error) {
       console.error("Error fetching books:", error);
     } finally {
-      setLoading(false); // Set loading state to false once fetching is complete
+      setLoading(false);
     };
   }, [user, title]);
+
 
   // UseEffect hook to fetch books when the component mounts or when dependencies change
   useEffect(() => {

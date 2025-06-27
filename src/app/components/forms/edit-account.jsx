@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { decryptUser } from "../../utils";
 import { useAuth } from "context/auth-context";
 import { UPDATE_MUTATION } from "client/mutations";
-import { createApolloClient } from "client/client";
+import { apolloClient } from "client/client";
 
 import Loader from "components/loader";
 
@@ -51,6 +51,7 @@ export default function EditForm() {
     if (file) {
       // Validate file type
       const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
       if (!allowedTypes.includes(file.type)) {
         setError("Unsupported image format. Allowed: JPEG, PNG, WebP");
         return;
@@ -98,11 +99,9 @@ export default function EditForm() {
       const credentials = {};
       
       // Only include fields that have values
-      if (formData.username.trim() !== "") credentials.username = formData.username;
       if (formData.email.trim() !== "") credentials.email = formData.email;
       if (formData.password.trim() !== "") {
         credentials.password = formData.password;
-        credentials.confirmPassword = formData.confirmPassword;
       };
 
       // Handle image file if selected
@@ -116,7 +115,7 @@ export default function EditForm() {
       };
 
       const auth = window.localStorage.getItem("token");
-      const client = createApolloClient(auth);
+      const client = apolloClient(auth);
     
       const { data } = await client.mutate({
         mutation: UPDATE_MUTATION,
@@ -132,15 +131,10 @@ export default function EditForm() {
       };
 
       // Decrypt and update user data
-      const userData = decryptUser(token);
+      const userData = await decryptUser(token);
       updateUser(userData);
-      
       setLoading(false);
-      setError(""); // Clear errors on success
-      
-      // Reset image file state
-      setImageFile(null);
-      
+
       // Optionally reset password fields
       setFormData(prev => ({
         ...prev,
@@ -149,24 +143,14 @@ export default function EditForm() {
       }));
 
     } catch (error) {
-      console.error("Update error:", error);
-      
-      // Handle GraphQL errors
-      if (error.graphQLErrors && error.graphQLErrors.length > 0) {
-        const graphqlError = error.graphQLErrors[0];
-        setError(graphqlError.message || "Failed to update user.");
-      } else if (error.networkError) {
-        setError("Network error. Please check your connection.");
-      } else {
-        setError(error.message || "An unexpected error occurred.");
-      };
-      
+      console.error("Update error:", error);      
       setLoading(false);
     };
   };
 
-  const passwordsMatch = !formData.password || formData.password === formData.confirmPassword;
   const color = "black";
+  const passwordsMatch = !formData.password || formData.password === formData.confirmPassword;
+  const defaultImage = "https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/images/users/default-profile-picture.webp";
 
   return (
     <div className="u23">
@@ -177,10 +161,10 @@ export default function EditForm() {
         <div className="relative w-48 h-48 mx-auto cursor-pointer" onClick={handleImageClick}>
           <img 
             className="w-48 h-48 rounded-full object-cover border-2 border-primary" 
-            src={preview || user?.photo || "/default-avatar.png"} 
+            src={preview || user?.photo || `${defaultImage}`} 
             alt="profile-picture" 
             onError={(e) => {
-              e.target.src = "/default-avatar.png";
+              e.target.src = `${defaultImage}`;
             }}
           />
           <div className="u1 u26 rounded-full">
@@ -196,13 +180,6 @@ export default function EditForm() {
             onChange={handleImageChange}
           />
         </div>
-
-        {/* Show selected file name */}
-        {imageFile && (
-          <p className="text-sm text-gray-600 text-center mt-2">
-            Selected: {imageFile.name}
-          </p>
-        )}
 
         {/* Email Input */}
         <input
