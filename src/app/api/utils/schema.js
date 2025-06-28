@@ -47,6 +47,14 @@ export const typeDefs = `
     photo: String
   }
 
+  input CreateBookInput {
+    title: String!
+    description: String!
+    username: String!
+    imageBase64: String
+    audioFilesBase64: [String!]
+  }
+
   type TokenResponse {
     data: String!
   }
@@ -57,5 +65,6 @@ export const typeDefs = `
     updateUser(credentials: UpdateUserInput!): TokenResponse!
     addLike(bookId: ID!, userId: ID!): TokenResponse!
     removeLike(bookId: ID!, userId: ID!): TokenResponse!
+    createBook(input: CreateBookInput!): TokenResponse!
   }
 `;

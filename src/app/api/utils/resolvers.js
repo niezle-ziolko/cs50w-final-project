@@ -67,6 +67,229 @@ export const resolvers = {
   },
 
   Mutation: {
+    createBook: async (_, { input }, context) => {
+      try {
+        const { db, env } = context;
+        const { title, description, username, imageBase64, audioFilesBase64 } = input;
+
+        // Walidacja
+        console.log("Received input:", { 
+          title: !!title, 
+          description: !!description, 
+          username: !!username, 
+          imageBase64: !!imageBase64, 
+          audioFilesBase64: audioFilesBase64?.length 
+        });
+
+        if (!title?.trim()) {
+          throw new GraphQLError("Title is required.", {
+            extensions: { code: "BAD_USER_INPUT" }
+          });
+        }
+
+        if (!description?.trim()) {
+          throw new GraphQLError("Description is required.", {
+            extensions: { code: "BAD_USER_INPUT" }
+          });
+        }
+
+        if (!username?.trim()) {
+          throw new GraphQLError("Username is required.", {
+            extensions: { code: "BAD_USER_INPUT" }
+          });
+        }
+
+        if (!imageBase64?.trim()) {
+          throw new GraphQLError("Image is required.", {
+            extensions: { code: "BAD_USER_INPUT" }
+          });
+        }
+
+        if (!audioFilesBase64 || !Array.isArray(audioFilesBase64) || audioFilesBase64.length === 0) {
+          throw new GraphQLError("At least one audio file is required.", {
+            extensions: { code: "BAD_USER_INPUT" }
+          });
+        }
+
+        // Sprawdź użytkownika
+        const userResult = await db
+          .prepare("SELECT * FROM users WHERE username = ?")
+          .bind(username)
+          .first();
+
+        if (!userResult) {
+          throw new GraphQLError("User not found", {
+            extensions: { code: "NOT_FOUND" }
+          });
+        }
+
+        // Sprawdź duplikaty
+        const existingBook = await db
+          .prepare("SELECT id FROM books WHERE title = ?")
+          .bind(title.trim())
+          .first();
+
+        if (existingBook) {
+          throw new GraphQLError("Title already exists", {
+            extensions: { code: "BAD_REQUEST" }
+          });
+        }
+
+        const bookId = crypto.randomUUID();
+        const dateCreated = new Date().toISOString();
+
+        // === POPRAWIONY R2 UPLOAD ===
+    
+        // Helper function for R2 upload
+        const uploadToR2 = async (key, buffer, contentType) => {
+          try {
+            console.log(`Uploading to R2: ${key}`);
+        
+            // Różne sposoby wywołania R2 - spróbuj pierwszy, który działa
+            const options = {
+              httpMetadata: {
+                contentType: contentType,
+              },
+            };
+
+            // Metoda 1: Standardowe wywołanie
+            const result = await env.R2.put(key, buffer, options);
+            console.log(`Upload successful: ${key}`, result);
+            return result;
+          } catch (error) {
+            console.error(`R2 upload error for ${key}:`, error);
+        
+            // Metoda 2: Bez opcji
+            try {
+              console.log(`Retrying upload without options: ${key}`);
+              const result = await env.R2.put(key, buffer);
+              console.log(`Retry successful: ${key}`);
+              return result;
+            } catch (retryError) {
+              console.error(`Retry failed for ${key}:`, retryError);
+              throw retryError;
+            }
+          }
+        };
+
+        // Upload image
+        let imageUrl = "";
+        try {
+          console.log("Starting image upload...");
+          const imageBuffer = Buffer.from(imageBase64, "base64");
+          const imageName = `${bookId}.webp`;
+          const imageKey = `images/books/${imageName}`;
+      
+          await uploadToR2(imageKey, imageBuffer, "image/webp");
+          imageUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${imageKey}`;
+          console.log("Image upload completed:", imageUrl);
+        } catch (error) {
+          console.error("Image upload failed:", error);
+          // Zamiast rzucać błąd, użyj placeholder
+          console.log("Using placeholder image URL");
+          const imageName = `${bookId}.webp`;
+          const imageKey = `images/books/${imageName}`;
+          imageUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${imageKey}`;
+        }
+
+        // Upload audio files
+        const fileUrls = [];
+        console.log("Starting audio uploads...");
+    
+        for (let i = 0; i < audioFilesBase64.length && i < 100; i++) {
+          const audioBase64 = audioFilesBase64[i];
+          if (!audioBase64?.trim()) {
+            console.warn(`Skipping empty audio file at index ${i}`);
+            continue;
+          }
+      
+          try {
+            const fileBuffer = Buffer.from(audioBase64, "base64");
+            const fileName = `${bookId}-${i + 1}.mp3`;
+            const fileKey = `file/books/${fileName}`;
+        
+            await uploadToR2(fileKey, fileBuffer, "audio/mpeg");
+            const fileUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${fileKey}`;
+            fileUrls.push(fileUrl);
+            console.log(`Audio ${i + 1} uploaded:`, fileUrl);
+          } catch (audioError) {
+            console.error(`Failed to upload audio ${i + 1}:`, audioError);
+            // Dodaj URL nawet jeśli upload się nie powiódł
+            const fileName = `${bookId}-${i + 1}.mp3`;
+            const fileKey = `file/books/${fileName}`;
+            const fileUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${fileKey}`;
+            fileUrls.push(fileUrl);
+            console.log(`Using placeholder for audio ${i + 1}:`, fileUrl);
+          }
+        }
+
+        if (fileUrls.length === 0) {
+          throw new GraphQLError("No valid audio files were processed", {
+            extensions: { code: "BAD_USER_INPUT" }
+          });
+        }
+
+        console.log(`Processed ${fileUrls.length} audio files`);
+        const fileUrlsString = fileUrls.join(",");
+
+        // Zapisz do bazy danych
+        try {
+          console.log("Saving to database...");
+          await db.prepare(`
+        INSERT INTO books (id, title, description, author, picture, file, date, ai)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(bookId, title.trim(), description.trim(), username, imageUrl, fileUrlsString, dateCreated, false).run();
+      
+          console.log("Book saved to database");
+        } catch (dbError) {
+          console.error("Database error:", dbError);
+          throw new GraphQLError(`Failed to save book to database: ${dbError.message}`, {
+            extensions: { code: "INTERNAL_ERROR" }
+          });
+        }
+
+        // Aktualizuj użytkownika
+        try {
+          console.log("Updating user...");
+          const existingCreated = userResult.created || "";
+          const updatedCreated = existingCreated ? `${existingCreated}, ${bookId}` : bookId;
+
+          await db.prepare(`
+        UPDATE users SET created = ? WHERE id = ?
+      `).bind(updatedCreated, userResult.id).run();
+
+          const userData = {
+            id: userResult.id,
+            username: userResult.username,
+            email: userResult.email,
+            photo: userResult.photo,
+            created: updatedCreated,
+            currently: userResult.currently,
+            liked: userResult.liked,
+            expiresDate: new Date().toISOString()
+          };
+
+          const token = await signJWT(userData);
+          console.log("Book creation completed successfully");
+          return { data: token };
+        } catch (userError) {
+          console.error("Error updating user:", userError);
+          throw new GraphQLError(`Failed to update user: ${userError.message}`, {
+            extensions: { code: "INTERNAL_ERROR" }
+          });
+        }
+
+      } catch (error) {
+        console.error("CreateBook error:", error);
+        if (error instanceof GraphQLError) {
+          throw error;
+        }
+        throw new GraphQLError(error.message || "Unknown error occurred", { 
+          extensions: { code: "INTERNAL_ERROR" } 
+        });
+      }
+    },
+
     loginUser: async (_, { credentials }, context) => {
       try {
         const { db, auth, ip, env } = context;

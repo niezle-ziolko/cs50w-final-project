@@ -1,10 +1,10 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 
-import { decryptUser } from "../../utils";
+import { apolloClient } from "client/client";
 import { useAuth } from "context/auth-context";
 import { UPDATE_MUTATION } from "client/mutations";
-import { apolloClient } from "client/client";
+import { decryptUser, fileToBase64 } from "../../utils";
 
 import Loader from "components/loader";
 
@@ -70,16 +70,6 @@ export default function EditForm() {
       reader.readAsDataURL(file);
       setError(""); // Clear any previous errors
     };
-  };
-
-  // Function to convert file to base64
-  const fileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
-    });
   };
 
   // Function to handle form submission
