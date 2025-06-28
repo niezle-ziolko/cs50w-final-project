@@ -70,3 +70,35 @@ export async function decryptData(encryptedData, iv) {
 
   return JSON.parse(new TextDecoder().decode(decrypted));
 };
+
+// Helper function for R2 upload
+export const uploadToR2 = async (key, buffer, contentType) => {
+  try {
+    console.log(`Uploading to R2: ${key}`);
+        
+    // Different ways to call R2 - try the first one that works
+    const options = {
+      httpMetadata: {
+        contentType: contentType
+      }
+    };
+
+    // Method 1: Standard call
+    const result = await env.R2.put(key, buffer, options);
+    console.log(`Upload successful: ${key}`, result);
+    return result;
+  } catch (error) {
+    console.error(`R2 upload error for ${key}:`, error);
+        
+    // Method 2: No options
+    try {
+      console.log(`Retrying upload without options: ${key}`);
+      const result = await env.R2.put(key, buffer);
+      console.log(`Retry successful: ${key}`);
+      return result;
+    } catch (retryError) {
+      console.error(`Retry failed for ${key}:`, retryError);
+      throw retryError;
+    }
+  }
+};

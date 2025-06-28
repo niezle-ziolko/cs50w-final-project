@@ -72,105 +72,43 @@ export const resolvers = {
         const { db, env } = context;
         const { title, description, username, imageBase64, audioFilesBase64 } = input;
 
-        // Walidacja
-        console.log("Received input:", { 
-          title: !!title, 
-          description: !!description, 
-          username: !!username, 
-          imageBase64: !!imageBase64, 
-          audioFilesBase64: audioFilesBase64?.length 
-        });
-
         if (!title?.trim()) {
-          throw new GraphQLError("Title is required.", {
-            extensions: { code: "BAD_USER_INPUT" }
-          });
-        }
+          throw new GraphQLError("Title is required.", { extensions: { code: "BAD_USER_INPUT" } });
+        };
 
         if (!description?.trim()) {
-          throw new GraphQLError("Description is required.", {
-            extensions: { code: "BAD_USER_INPUT" }
-          });
-        }
+          throw new GraphQLError("Description is required.", { extensions: { code: "BAD_USER_INPUT" } });
+        };
 
         if (!username?.trim()) {
-          throw new GraphQLError("Username is required.", {
-            extensions: { code: "BAD_USER_INPUT" }
-          });
-        }
+          throw new GraphQLError("Username is required.", { extensions: { code: "BAD_USER_INPUT" } });
+        };
 
         if (!imageBase64?.trim()) {
-          throw new GraphQLError("Image is required.", {
-            extensions: { code: "BAD_USER_INPUT" }
-          });
-        }
+          throw new GraphQLError("Image is required.", { extensions: { code: "BAD_USER_INPUT" } });
+        };
 
         if (!audioFilesBase64 || !Array.isArray(audioFilesBase64) || audioFilesBase64.length === 0) {
-          throw new GraphQLError("At least one audio file is required.", {
-            extensions: { code: "BAD_USER_INPUT" }
-          });
-        }
+          throw new GraphQLError("At least one audio file is required.", { extensions: { code: "BAD_USER_INPUT" } });
+        };
 
-        // Sprawdź użytkownika
-        const userResult = await db
-          .prepare("SELECT * FROM users WHERE username = ?")
-          .bind(username)
-          .first();
+        // Check user
+        const userResult = await db.prepare("SELECT * FROM users WHERE username = ?").bind(username).first();
 
         if (!userResult) {
-          throw new GraphQLError("User not found", {
-            extensions: { code: "NOT_FOUND" }
-          });
-        }
+          throw new GraphQLError("User not found", { extensions: { code: "NOT_FOUND" } });
+        };
 
-        // Sprawdź duplikaty
-        const existingBook = await db
-          .prepare("SELECT id FROM books WHERE title = ?")
-          .bind(title.trim())
-          .first();
+        // Check duplicate
+        const existingBook = await db.prepare("SELECT id FROM books WHERE title = ?").bind(title.trim()).first();
 
         if (existingBook) {
-          throw new GraphQLError("Title already exists", {
-            extensions: { code: "BAD_REQUEST" }
-          });
-        }
-
-        const bookId = crypto.randomUUID();
-        const dateCreated = new Date().toISOString();
-
-        // === POPRAWIONY R2 UPLOAD ===
-    
-        // Helper function for R2 upload
-        const uploadToR2 = async (key, buffer, contentType) => {
-          try {
-            console.log(`Uploading to R2: ${key}`);
-        
-            // Różne sposoby wywołania R2 - spróbuj pierwszy, który działa
-            const options = {
-              httpMetadata: {
-                contentType: contentType,
-              },
-            };
-
-            // Metoda 1: Standardowe wywołanie
-            const result = await env.R2.put(key, buffer, options);
-            console.log(`Upload successful: ${key}`, result);
-            return result;
-          } catch (error) {
-            console.error(`R2 upload error for ${key}:`, error);
-        
-            // Metoda 2: Bez opcji
-            try {
-              console.log(`Retrying upload without options: ${key}`);
-              const result = await env.R2.put(key, buffer);
-              console.log(`Retry successful: ${key}`);
-              return result;
-            } catch (retryError) {
-              console.error(`Retry failed for ${key}:`, retryError);
-              throw retryError;
-            }
-          }
+          throw new GraphQLError("Title already exists", { extensions: { code: "BAD_REQUEST" } });
         };
+
+        // Generate a unique UUID
+        const bookId = uuidv4();
+        const dateCreated = new Date().toISOString();
 
         // Upload image
         let imageUrl = "";
@@ -180,17 +118,12 @@ export const resolvers = {
           const imageName = `${bookId}.webp`;
           const imageKey = `images/books/${imageName}`;
       
-          await uploadToR2(imageKey, imageBuffer, "image/webp");
+          await env.R2.put(imageKey, imageBuffer);
           imageUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${imageKey}`;
           console.log("Image upload completed:", imageUrl);
         } catch (error) {
           console.error("Image upload failed:", error);
-          // Zamiast rzucać błąd, użyj placeholder
-          console.log("Using placeholder image URL");
-          const imageName = `${bookId}.webp`;
-          const imageKey = `images/books/${imageName}`;
-          imageUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${imageKey}`;
-        }
+        };
 
         // Upload audio files
         const fileUrls = [];
@@ -201,62 +134,50 @@ export const resolvers = {
           if (!audioBase64?.trim()) {
             console.warn(`Skipping empty audio file at index ${i}`);
             continue;
-          }
+          };
       
           try {
             const fileBuffer = Buffer.from(audioBase64, "base64");
             const fileName = `${bookId}-${i + 1}.mp3`;
             const fileKey = `file/books/${fileName}`;
         
-            await uploadToR2(fileKey, fileBuffer, "audio/mpeg");
+            await env.R2.put(fileKey, fileBuffer);
             const fileUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${fileKey}`;
             fileUrls.push(fileUrl);
             console.log(`Audio ${i + 1} uploaded:`, fileUrl);
           } catch (audioError) {
             console.error(`Failed to upload audio ${i + 1}:`, audioError);
-            // Dodaj URL nawet jeśli upload się nie powiódł
-            const fileName = `${bookId}-${i + 1}.mp3`;
-            const fileKey = `file/books/${fileName}`;
-            const fileUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${fileKey}`;
-            fileUrls.push(fileUrl);
-            console.log(`Using placeholder for audio ${i + 1}:`, fileUrl);
-          }
-        }
+          };
+        };
 
         if (fileUrls.length === 0) {
-          throw new GraphQLError("No valid audio files were processed", {
-            extensions: { code: "BAD_USER_INPUT" }
-          });
-        }
+          throw new GraphQLError("No valid audio files were processed", { extensions: { code: "BAD_USER_INPUT" } });
+        };
 
         console.log(`Processed ${fileUrls.length} audio files`);
         const fileUrlsString = fileUrls.join(",");
 
-        // Zapisz do bazy danych
+        // Save to database
         try {
           console.log("Saving to database...");
           await db.prepare(`
-        INSERT INTO books (id, title, description, author, picture, file, date, ai)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(bookId, title.trim(), description.trim(), username, imageUrl, fileUrlsString, dateCreated, false).run();
+            INSERT INTO books (id, title, description, author, picture, file, date, ai)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          `).bind(bookId, title.trim(), description.trim(), username, imageUrl, fileUrlsString, dateCreated, false).run();
       
           console.log("Book saved to database");
         } catch (dbError) {
           console.error("Database error:", dbError);
-          throw new GraphQLError(`Failed to save book to database: ${dbError.message}`, {
-            extensions: { code: "INTERNAL_ERROR" }
-          });
-        }
+          throw new GraphQLError(`Failed to save book to database: ${dbError.message}`, { extensions: { code: "INTERNAL_ERROR" } });
+        };
 
-        // Aktualizuj użytkownika
+        // Update user
         try {
           console.log("Updating user...");
           const existingCreated = userResult.created || "";
           const updatedCreated = existingCreated ? `${existingCreated}, ${bookId}` : bookId;
 
-          await db.prepare(`
-        UPDATE users SET created = ? WHERE id = ?
-      `).bind(updatedCreated, userResult.id).run();
+          await db.prepare("UPDATE users SET created = ? WHERE id = ?").bind(updatedCreated, userResult.id).run();
 
           const userData = {
             id: userResult.id,
@@ -277,17 +198,14 @@ export const resolvers = {
           throw new GraphQLError(`Failed to update user: ${userError.message}`, {
             extensions: { code: "INTERNAL_ERROR" }
           });
-        }
+        };
 
       } catch (error) {
         console.error("CreateBook error:", error);
-        if (error instanceof GraphQLError) {
-          throw error;
-        }
-        throw new GraphQLError(error.message || "Unknown error occurred", { 
-          extensions: { code: "INTERNAL_ERROR" } 
-        });
-      }
+        if (error instanceof GraphQLError) { throw error; };
+
+        throw new GraphQLError(error.message || "Unknown error occurred", { extensions: { code: "INTERNAL_ERROR" } });
+      };
     },
 
     loginUser: async (_, { credentials }, context) => {
@@ -365,7 +283,7 @@ export const resolvers = {
           throw new GraphQLError("Email or username already exists", { extensions: { code: "BAD_USER_INPUT" } });
         };
 
-        // Generate a unique UUID for the new message
+        // Generate a unique UUID
         const userId = uuidv4();
         const hashedPassword = await hashPassword(password);
         const defaultPhotoUrl = "https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/images/users/default-profile-picture.webp";
