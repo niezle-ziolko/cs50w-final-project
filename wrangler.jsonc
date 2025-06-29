@@ -44,8 +44,7 @@
         "NEXT_PUBLIC_BOOK_AUTH": "aGVCzBMZvmaIujfzlLovQGPuB93E1eId",
         "SECRET_KEY": "0x4AAAAAAA8Cypo9aDiDt4r2F23lLNjpoZs",
         "CRYPTO_KEY": "gEvMYq9ucDTpJBZxjDycysJTXMoGcNrn",
-        "SPEECHIFY_API_KEY": "",
 	    "NODE_VERSION": "24.1.0",
-        "PNPM_VERSION": "10.12.2"
+        "PNPM_VERSION": "10.12.4"
 	}
 }
