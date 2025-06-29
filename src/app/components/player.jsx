@@ -110,9 +110,9 @@ export default function AudioPlayer({ title }) {
               const activeClass = isActive ? " text-third border-third" : "";
 
               return (
-                <button className={`${baseClass}${activeClass}`} key={index} onClick={() => handleChapterClick(chapter.url)}>
+                <span className={`${baseClass}${activeClass}`} key={index} onClick={() => handleChapterClick(chapter.url)}>
                   Chapter {chapter.number}
-                </button>
+                </span>
               );
             })
           ) : (

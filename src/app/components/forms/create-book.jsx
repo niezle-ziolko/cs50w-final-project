@@ -1,36 +1,13 @@
 "use client";
 import { useState } from "react";
-import { gql } from "@apollo/client";
+
+import { CREATE_BOOK_MUTATION } from "client/mutations";
+import { fileToBase64 } from "../../utils";
 import { apolloClient } from "client/client";
 import { useAuth } from "context/auth-context";
 
 import AIIcon from "styles/icons/ai";
 import Loader from "components/loader";
-
-// Helper to convert file to base64
-const fileToBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result === "string") {
-        resolve(result.split(",")[1]); // Only base64 content
-      } else {
-        reject(new Error("Failed to read file"));
-      }
-    };
-    reader.onerror = (error) => reject(error);
-  });
-
-// GraphQL mutation
-const CREATE_BOOK_MUTATION = gql`
-  mutation CreateBook($input: CreateBookInput!) {
-    createBook(input: $input) {
-      data
-    }
-  }
-`;
 
 export default function CreateForm() {
   const { updateUser, user } = useAuth();
@@ -280,12 +257,9 @@ export default function CreateForm() {
                 {fileNames.map((name, index) => (
                   <div key={index} className="flex justify-between items-center">
                     <span>{name}</span>
-                    <button 
-                      type="button" 
-                      onClick={() => removeFile(index, isTextMode ? "text" : "audio")}
-                    >
+                    <span className="font-bold cursor-pointer" type="button" onClick={() => removeFile(index, isTextMode ? "text" : "audio")}>
                       Remove
-                    </button>
+                    </span>
                   </div>
                 ))}
               </div>

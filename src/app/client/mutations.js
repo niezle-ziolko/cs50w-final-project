@@ -39,3 +39,11 @@ export const UNLIKE_MUTATION = gql`
     }
   }
 `;
+
+export const CREATE_BOOK_MUTATION = gql`
+  mutation CreateBook($input: CreateBookInput!) {
+    createBook(input: $input) {
+      data
+    }
+  }
+`;

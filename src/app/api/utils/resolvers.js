@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { GraphQLError } from "graphql";
 
 import { bearerHeader, authenticateHeader } from "./headers";
-import { signJWT, hashPassword } from "./utils";
+import { signJWT, hashPassword, generateSpeechFromText } from "./utils";
 
 export const resolvers = {
   Query: {
@@ -70,143 +70,107 @@ export const resolvers = {
     createBook: async (_, { input }, context) => {
       try {
         const { db, env } = context;
-        const { title, description, username, imageBase64, audioFilesBase64 } = input;
+        const { title, description, username, imageBase64, audioFilesBase64, ai } = input;
 
-        if (!title?.trim()) {
-          throw new GraphQLError("Title is required.", { extensions: { code: "BAD_USER_INPUT" } });
-        };
-
-        if (!description?.trim()) {
-          throw new GraphQLError("Description is required.", { extensions: { code: "BAD_USER_INPUT" } });
-        };
-
-        if (!username?.trim()) {
-          throw new GraphQLError("Username is required.", { extensions: { code: "BAD_USER_INPUT" } });
-        };
-
-        if (!imageBase64?.trim()) {
-          throw new GraphQLError("Image is required.", { extensions: { code: "BAD_USER_INPUT" } });
-        };
-
+        // Walidacje podstawowe
+        if (!title?.trim()) throw new GraphQLError("Title is required.", { extensions: { code: "BAD_USER_INPUT" } });
+        if (!description?.trim()) throw new GraphQLError("Description is required.", { extensions: { code: "BAD_USER_INPUT" } });
+        if (!username?.trim()) throw new GraphQLError("Username is required.", { extensions: { code: "BAD_USER_INPUT" } });
+        if (!imageBase64?.trim()) throw new GraphQLError("Image is required.", { extensions: { code: "BAD_USER_INPUT" } });
         if (!audioFilesBase64 || !Array.isArray(audioFilesBase64) || audioFilesBase64.length === 0) {
-          throw new GraphQLError("At least one audio file is required.", { extensions: { code: "BAD_USER_INPUT" } });
-        };
+          throw new GraphQLError(ai ? "At least one text file is required." : "At least one audio file is required.", {
+            extensions: { code: "BAD_USER_INPUT" }
+          });
+        }
 
-        // Check user
         const userResult = await db.prepare("SELECT * FROM users WHERE username = ?").bind(username).first();
+        if (!userResult) throw new GraphQLError("User not found", { extensions: { code: "NOT_FOUND" } });
 
-        if (!userResult) {
-          throw new GraphQLError("User not found", { extensions: { code: "NOT_FOUND" } });
-        };
-
-        // Check duplicate
         const existingBook = await db.prepare("SELECT id FROM books WHERE title = ?").bind(title.trim()).first();
+        if (existingBook) throw new GraphQLError("Title already exists", { extensions: { code: "BAD_REQUEST" } });
 
-        if (existingBook) {
-          throw new GraphQLError("Title already exists", { extensions: { code: "BAD_REQUEST" } });
-        };
-
-        // Generate a unique UUID
         const bookId = uuidv4();
         const dateCreated = new Date().toISOString();
 
         // Upload image
-        let imageUrl = "";
-        try {
-          console.log("Starting image upload...");
-          const imageBuffer = Buffer.from(imageBase64, "base64");
-          const imageName = `${bookId}.webp`;
-          const imageKey = `images/books/${imageName}`;
-      
-          await env.R2.put(imageKey, imageBuffer);
-          imageUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${imageKey}`;
-          console.log("Image upload completed:", imageUrl);
-        } catch (error) {
-          console.error("Image upload failed:", error);
-        };
+        const imageBuffer = Buffer.from(imageBase64, "base64");
+        const imageKey = `images/books/${bookId}.webp`;
+        await env.R2.put(imageKey, imageBuffer);
+        const imageUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${imageKey}`;
 
-        // Upload audio files
+        // Przetwarzanie plików audio lub tekstowych
         const fileUrls = [];
-        console.log("Starting audio uploads...");
-    
+
         for (let i = 0; i < audioFilesBase64.length && i < 100; i++) {
-          const audioBase64 = audioFilesBase64[i];
-          if (!audioBase64?.trim()) {
-            console.warn(`Skipping empty audio file at index ${i}`);
-            continue;
-          };
-      
+          const base64 = audioFilesBase64[i];
+          if (!base64?.trim()) continue;
+
+          let audioBuffer;
+
+          if (ai) {
+            // AI: konwersja tekstu do mowy
+            try {
+              const textContent = Buffer.from(base64, "base64").toString("utf-8");
+              audioBuffer = await generateSpeechFromText(textContent);
+            } catch (err) {
+              console.error(`AI audio generation failed for file ${i + 1}:`, err);
+              continue;
+            }
+          } else {
+            // Zwykły plik audio
+            try {
+              audioBuffer = Buffer.from(base64, "base64");
+            } catch (err) {
+              console.error(`Base64 decoding failed for audio ${i + 1}:`, err);
+              continue;
+            }
+          }
+
           try {
-            const fileBuffer = Buffer.from(audioBase64, "base64");
             const fileName = `${bookId}-${i + 1}.mp3`;
             const fileKey = `file/books/${fileName}`;
-        
-            await env.R2.put(fileKey, fileBuffer);
+            await env.R2.put(fileKey, audioBuffer);
             const fileUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${fileKey}`;
             fileUrls.push(fileUrl);
-            console.log(`Audio ${i + 1} uploaded:`, fileUrl);
-          } catch (audioError) {
-            console.error(`Failed to upload audio ${i + 1}:`, audioError);
-          };
-        };
+          } catch (uploadErr) {
+            console.error(`Upload failed for file ${i + 1}:`, uploadErr);
+          }
+        }
 
         if (fileUrls.length === 0) {
-          throw new GraphQLError("No valid audio files were processed", { extensions: { code: "BAD_USER_INPUT" } });
-        };
+          throw new GraphQLError("No valid files were processed.", { extensions: { code: "BAD_USER_INPUT" } });
+        }
 
-        console.log(`Processed ${fileUrls.length} audio files`);
         const fileUrlsString = fileUrls.join(",");
 
-        // Save to database
-        try {
-          console.log("Saving to database...");
-          await db.prepare(`
-            INSERT INTO books (id, title, description, author, picture, file, date, ai)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          `).bind(bookId, title.trim(), description.trim(), username, imageUrl, fileUrlsString, dateCreated, false).run();
-      
-          console.log("Book saved to database");
-        } catch (dbError) {
-          console.error("Database error:", dbError);
-          throw new GraphQLError(`Failed to save book to database: ${dbError.message}`, { extensions: { code: "INTERNAL_ERROR" } });
-        };
+        // Zapis do bazy danych
+        await db.prepare(`
+      INSERT INTO books (id, title, description, author, picture, file, date, ai)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(bookId, title.trim(), description.trim(), username, imageUrl, fileUrlsString, dateCreated, !!ai).run();
 
-        // Update user
-        try {
-          console.log("Updating user...");
-          const existingCreated = userResult.created || "";
-          const updatedCreated = existingCreated ? `${existingCreated}, ${bookId}` : bookId;
+        const updatedCreated = userResult.created ? `${userResult.created}, ${bookId}` : bookId;
+        await db.prepare("UPDATE users SET created = ? WHERE id = ?").bind(updatedCreated, userResult.id).run();
 
-          await db.prepare("UPDATE users SET created = ? WHERE id = ?").bind(updatedCreated, userResult.id).run();
+        const token = await signJWT({
+          id: userResult.id,
+          username: userResult.username,
+          email: userResult.email,
+          photo: userResult.photo,
+          created: userResult.created,
+          currently: userResult.currently,
+          liked: userResult.liked,
+          expiresDate: new Date().toISOString()
+        });
 
-          const userData = {
-            id: userResult.id,
-            username: userResult.username,
-            email: userResult.email,
-            photo: userResult.photo,
-            created: updatedCreated,
-            currently: userResult.currently,
-            liked: userResult.liked,
-            expiresDate: new Date().toISOString()
-          };
-
-          const token = await signJWT(userData);
-          console.log("Book creation completed successfully");
-          return { data: token };
-        } catch (userError) {
-          console.error("Error updating user:", userError);
-          throw new GraphQLError(`Failed to update user: ${userError.message}`, {
-            extensions: { code: "INTERNAL_ERROR" }
-          });
-        };
-
+        return { data: token };
       } catch (error) {
         console.error("CreateBook error:", error);
-        if (error instanceof GraphQLError) { throw error; };
-
+        if (error instanceof GraphQLError) throw error;
         throw new GraphQLError(error.message || "Unknown error occurred", { extensions: { code: "INTERNAL_ERROR" } });
-      };
-    },
+      }
+    }
+    ,
 
     loginUser: async (_, { credentials }, context) => {
       try {

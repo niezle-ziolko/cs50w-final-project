@@ -1,4 +1,5 @@
 import { SignJWT, jwtVerify } from "jose";
+import { SpeechifyClient } from "@speechify/api";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 const { env } = await getCloudflareContext({ async: true });
@@ -71,34 +72,19 @@ export async function decryptData(encryptedData, iv) {
   return JSON.parse(new TextDecoder().decode(decrypted));
 };
 
-// Helper function for R2 upload
-export const uploadToR2 = async (key, buffer, contentType) => {
-  try {
-    console.log(`Uploading to R2: ${key}`);
-        
-    // Different ways to call R2 - try the first one that works
-    const options = {
-      httpMetadata: {
-        contentType: contentType
-      }
-    };
+export async function generateSpeechFromText(text) {
+  const client = new SpeechifyClient({ token: env.SPEECHIFY_API_KEY });
 
-    // Method 1: Standard call
-    const result = await env.R2.put(key, buffer, options);
-    console.log(`Upload successful: ${key}`, result);
-    return result;
-  } catch (error) {
-    console.error(`R2 upload error for ${key}:`, error);
-        
-    // Method 2: No options
-    try {
-      console.log(`Retrying upload without options: ${key}`);
-      const result = await env.R2.put(key, buffer);
-      console.log(`Retry successful: ${key}`);
-      return result;
-    } catch (retryError) {
-      console.error(`Retry failed for ${key}:`, retryError);
-      throw retryError;
-    }
-  }
+  try {
+    const response = await client.tts.audio.speech({
+      input: text,
+      voiceId: "your_voice_id"
+    });
+
+    const audioBase64 = response.audioContent;
+
+    return Buffer.from(audioBase64, "base64");
+  } catch (err) {
+    throw new Error(`Speechify TTS failed: ${err.message}`);
+  };
 };
