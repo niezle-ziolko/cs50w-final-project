@@ -1,5 +1,4 @@
 import { SignJWT, jwtVerify } from "jose";
-import { SpeechifyClient } from "@speechify/api";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 const { env } = await getCloudflareContext({ async: true });
@@ -72,19 +71,93 @@ export async function decryptData(encryptedData, iv) {
   return JSON.parse(new TextDecoder().decode(decrypted));
 };
 
-export async function generateSpeechFromText(text) {
-  const client = new SpeechifyClient({ token: env.SPEECHIFY_API_KEY });
+export async function convertToMp3(fileBinary, filename) {
+  const apiKey = env.CAMB_AI_KEY;
 
-  try {
-    const response = await client.tts.audio.speech({
-      input: text,
-      voiceId: "your_voice_id"
+  const formData = new FormData();
+  formData.append("file", new File([fileBinary], filename));
+  formData.append("source_language", "1");
+
+  // 1. Sending the file
+  const response = await fetch("https://client.camb.ai/apis/story", {
+    method: "POST",
+    headers: {
+      "x-api-key": apiKey,
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+
+    console.error("Camb.ai upload error:", errorText);
+    throw new Error(`Camb.ai upload failed: ${response.status}`);
+  };
+
+  const result = await response.json();
+  const taskId = result?.task_id;
+
+  if (!taskId) {
+    console.error("Invalid Camb.ai response:", result);
+    throw new Error("Camb.ai task_id not found.");
+  };
+
+  // 2. Polling status
+  let runId = null;
+  for (let i = 0; i < 20; i++) {
+    await new Promise(r => setTimeout(r, 3000));
+
+    const statusRes = await fetch(`https://client.camb.ai/apis/story/${taskId}`, {
+      headers: {
+        "x-api-key": apiKey
+      }
     });
 
-    const audioBase64 = response.audioContent;
+    if (!statusRes.ok) {
+      const errorText = await statusRes.text();
 
-    return Buffer.from(audioBase64, "base64");
-  } catch (err) {
-    throw new Error(`Speechify TTS failed: ${err.message}`);
+      console.error("Camb.ai status error:", errorText);
+      throw new Error(`Camb.ai status check failed: ${statusRes.status}`);
+    };
+
+    const statusJson = await statusRes.json();
+
+    if (statusJson?.status === "SUCCESS") {
+      runId = statusJson?.run_id;
+
+      break;
+    } else if (statusJson?.status === "FAILED") {
+      console.error("Camb.ai reported failure:", statusJson);
+      throw new Error("Camb.ai conversion failed.");
+    };
   };
+
+  if (!runId) {
+    console.error("Camb.ai did not return run_id after polling.");
+    throw new Error("Camb.ai processing timeout or no run_id.");
+  };
+
+  // 3. Downloading the final audio
+  const finalRes = await fetch(`https://client.camb.ai/apis/story-result/${runId}`, {
+    headers: {
+      "x-api-key": apiKey
+    }
+  });
+
+  if (!finalRes.ok) {
+    const errorText = await finalRes.text();
+
+    console.error("Camb.ai result fetch error:", errorText);
+    throw new Error(`Camb.ai result fetch failed: ${finalRes.status}`);
+  };
+
+  const finalJson = await finalRes.json();
+  const audioUrl = finalJson?.audio_url;
+
+  if (!audioUrl) {
+    console.error("Camb.ai response missing audio_url:", finalJson);
+    throw new Error("Camb.ai audio_url not found.");
+  };
+
+  return audioUrl;
 };

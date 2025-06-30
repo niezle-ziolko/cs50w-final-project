@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { GraphQLError } from "graphql";
 
 import { bearerHeader, authenticateHeader } from "./headers";
-import { signJWT, hashPassword } from "./utils";
+import { signJWT, hashPassword, convertToMp3 } from "./utils";
 
 export const resolvers = {
   Query: {
@@ -113,12 +113,13 @@ export const resolvers = {
         // Upload image
         let imageUrl = "";
         try {
-          console.log("Starting image upload...");
-          const imageBuffer = Buffer.from(imageBase64, "base64");
+          const cleanBase64 = imageBase64.split(",")[1]; // usuwa prefix data URI
+          const imageBinary = Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0));
+
           const imageName = `${bookId}.webp`;
           const imageKey = `images/books/${imageName}`;
-      
-          await env.R2.put(imageKey, imageBuffer);
+
+          await env.R2.put(imageKey, imageBinary);
           imageUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${imageKey}`;
           console.log("Image upload completed:", imageUrl);
         } catch (error) {
@@ -127,26 +128,58 @@ export const resolvers = {
 
         // Upload audio files
         const fileUrls = [];
-        console.log("Starting audio uploads...");
-    
+        let isAiGenerated = false;
+
         for (let i = 0; i < audioFilesBase64.length && i < 100; i++) {
-          const audioBase64 = audioFilesBase64[i];
-          if (!audioBase64?.trim()) {
-            console.warn(`Skipping empty audio file at index ${i}`);
-            continue;
-          };
-      
+          const base64 = audioFilesBase64[i];
+
+          if (!base64?.trim()) continue;
+
           try {
-            const fileBuffer = Buffer.from(audioBase64, "base64");
-            const fileName = `${bookId}-${i + 1}.mp3`;
-            const fileKey = `file/books/${fileName}`;
-        
-            await env.R2.put(fileKey, fileBuffer);
-            const fileUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${fileKey}`;
-            fileUrls.push(fileUrl);
-            console.log(`Audio ${i + 1} uploaded:`, fileUrl);
-          } catch (audioError) {
-            console.error(`Failed to upload audio ${i + 1}:`, audioError);
+            const [meta, data] = base64.split(",");
+            const mimeType = meta.match(/data:(.*?);base64/)?.[1];
+
+            if (!mimeType || !data) {
+              console.warn(`Invalid base64 format at index ${i}`);
+              continue;
+            };
+
+            const fileBuffer = Uint8Array.from(atob(data), c => c.charCodeAt(0));
+
+            let extension = "";
+            if (mimeType === "audio/mpeg") extension = "mp3";
+            else if (mimeType === "text/plain") extension = "txt";
+            else if (mimeType === "application/pdf") extension = "pdf";
+            else {
+              console.warn(`Unsupported MIME type at index ${i}: ${mimeType}`);
+              continue;
+            };
+
+            let finalAudioUrl = "";
+
+            if (extension === "txt" || extension === "pdf") {
+              // 👉 Processing by Camb.ai
+              const cambUrl = await convertToMp3(fileBuffer, `input.${extension}`);
+              const audioRes = await fetch(cambUrl);
+              const audioBinary = new Uint8Array(await audioRes.arrayBuffer());
+
+              const fileName = `${bookId}-${i + 1}.mp3`;
+              const fileKey = `file/books/${fileName}`;
+              await env.R2.put(fileKey, audioBinary);
+              finalAudioUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${fileKey}`;
+              isAiGenerated = true;
+            } else {
+              // 👉 Direct .mp3 audio
+              const fileName = `${bookId}-${i + 1}.mp3`;
+              const fileKey = `file/books/${fileName}`;
+              await env.R2.put(fileKey, fileBuffer);
+              finalAudioUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${fileKey}`;
+            };
+
+            fileUrls.push(finalAudioUrl);
+            console.log(`Uploaded/Generated audio ${i + 1}:`, finalAudioUrl);
+          } catch (err) {
+            console.error(`Audio file ${i + 1} processing failed:`, err);
           };
         };
 
@@ -154,18 +187,14 @@ export const resolvers = {
           throw new GraphQLError("No valid audio files were processed", { extensions: { code: "BAD_USER_INPUT" } });
         };
 
-        console.log(`Processed ${fileUrls.length} audio files`);
         const fileUrlsString = fileUrls.join(",");
 
         // Save to database
         try {
-          console.log("Saving to database...");
           await db.prepare(`
             INSERT INTO books (id, title, description, author, picture, file, date, ai)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          `).bind(bookId, title.trim(), description.trim(), username, imageUrl, fileUrlsString, dateCreated, false).run();
-      
-          console.log("Book saved to database");
+          `).bind(bookId, title.trim(), description.trim(), username, imageUrl, fileUrlsString, dateCreated, isAiGenerated).run();
         } catch (dbError) {
           console.error("Database error:", dbError);
           throw new GraphQLError(`Failed to save book to database: ${dbError.message}`, { extensions: { code: "INTERNAL_ERROR" } });
@@ -184,7 +213,7 @@ export const resolvers = {
             username: userResult.username,
             email: userResult.email,
             photo: userResult.photo,
-            created: userResult.created,
+            created: updatedCreated,
             currently: userResult.currently,
             liked: userResult.liked,
             expiresDate: new Date().toISOString()
@@ -195,11 +224,8 @@ export const resolvers = {
           return { data: token };
         } catch (userError) {
           console.error("Error updating user:", userError);
-          throw new GraphQLError(`Failed to update user: ${userError.message}`, {
-            extensions: { code: "INTERNAL_ERROR" }
-          });
+          throw new GraphQLError(`Failed to update user: ${userError.message}`, { extensions: { code: "INTERNAL_ERROR" } });
         };
-
       } catch (error) {
         console.error("CreateBook error:", error);
         if (error instanceof GraphQLError) { throw error; };

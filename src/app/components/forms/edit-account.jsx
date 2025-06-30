@@ -105,6 +105,12 @@ export default function EditForm() {
       };
 
       const auth = window.localStorage.getItem("token");
+
+      if (!auth) {
+        setError("Authentication token missing. Please log in again.");
+        return;
+      };
+
       const client = apolloClient(auth);
     
       const { data } = await client.mutate({

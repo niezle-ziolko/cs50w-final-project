@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
 
-import { CREATE_BOOK_MUTATION } from "client/mutations";
-import { fileToBase64 } from "../../utils";
 import { apolloClient } from "client/client";
 import { useAuth } from "context/auth-context";
+import { CREATE_BOOK_MUTATION } from "client/mutations";
+import { decryptUser, fileToBase64 } from "../../utils";
 
 import AIIcon from "styles/icons/ai";
 import Loader from "components/loader";
@@ -16,7 +16,7 @@ export default function CreateForm() {
     description: "",
     audio: [],
     textFiles: [],
-    image: null,
+    image: null
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -42,33 +42,38 @@ export default function CreateForm() {
             ...newFiles,
           ],
         }));
-      }
+      };
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    };
   };
 
   const validateForm = () => {
     if (!formData.title.trim()) {
       setError("Title is required");
       return false;
-    }
+    };
+
     if (!formData.description.trim()) {
       setError("Description is required");
       return false;
-    }
+    };
+
     if (!formData.image) {
       setError("Cover image is required");
       return false;
-    }
+    };
+
     if (formData.audio.length === 0 && formData.textFiles.length === 0) {
       setError("At least one audio or text file is required");
       return false;
-    }
+    };
+
     if (!user?.username) {
       setError("You must have a username to submit this form");
       return false;
-    }
+    };
+
     return true;
   };
 
@@ -78,95 +83,88 @@ export default function CreateForm() {
 
     if (!validateForm()) {
       return;
-    }
+    };
 
     setLoading(true);
 
-    try {
-      console.log("Starting file conversion...");
-      
+    try {      
       // Convert image to base64
       let imageBase64 = null;
       if (formData.image) {
         imageBase64 = await fileToBase64(formData.image);
-        console.log("Image converted, size:", imageBase64?.length);
-      }
+      };
 
       // Convert audio files to base64
       const filesToProcess = isTextMode ? formData.textFiles : formData.audio;
-      console.log("Processing files:", filesToProcess.length);
       
       const audioFilesBase64 = [];
       for (const file of filesToProcess) {
         try {
           const base64 = await fileToBase64(file);
+
           if (base64 && base64.trim()) {
             audioFilesBase64.push(base64);
-          }
+          };
         } catch (fileError) {
           console.error("Error converting file:", file.name, fileError);
           // Continue with other files
-        }
-      }
-
-      console.log("Files converted:", audioFilesBase64.length);
+        };
+      };
 
       if (audioFilesBase64.length === 0) {
         setError("Failed to process any files. Please try again.");
         return;
-      }
+      };
 
-      const token = localStorage.getItem("token");
-      if (!token) {
+      const auth = localStorage.getItem("token");
+
+      if (!auth) {
         setError("Authentication token missing. Please log in again.");
         return;
-      }
+      };
 
-      const client = apolloClient(token);
+      const client = apolloClient(auth);
 
       const mutationInput = {
         title: formData.title.trim(),
         description: formData.description.trim(),
         username: user.username,
         imageBase64,
-        audioFilesBase64,
+        audioFilesBase64
       };
-
-      console.log("Sending mutation with input:", {
-        ...mutationInput,
-        imageBase64: imageBase64 ? "Present" : "Missing",
-        audioFilesBase64: audioFilesBase64.length
-      });
 
       const { data } = await client.mutate({
         mutation: CREATE_BOOK_MUTATION,
         variables: {
-          input: mutationInput,
+          input: mutationInput
         },
         errorPolicy: "all" // This will help capture more error details
       });
 
-      if (data?.createBook?.data) {
-        // Reset form
-        setFormData({
-          title: "",
-          description: "",
-          audio: [],
-          textFiles: [],
-          image: null,
-        });
-        setImageName("No file chosen");
-        setFileNames([]);
-        
-        // Update user context if needed
-        updateUser(user);
-        console.log("Book created successfully");
-        
-        // You might want to redirect or show success message here
-        alert("Book created successfully!");
-      } else {
-        setError("Error creating book - no data returned");
-      }
+      const token = data?.createBook?.data;
+
+      if (!token) {
+        throw new Error("No user data returned from server.");
+      };
+
+      // Decrypt and update user data
+      const userData = await decryptUser(token);
+      updateUser(userData);
+      setLoading(false);
+
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        audio: [],
+        textFiles: [],
+        image: null
+      });
+      setImageName("No file chosen");
+      setFileNames([]);
+
+      // You might want to redirect or show success message here
+      alert("Book created successfully!");
     } catch (err) {
       console.error("Full error object:", err);
       
@@ -180,10 +178,10 @@ export default function CreateForm() {
         setError(err.message);
       } else {
         setError("An unexpected error occurred.");
-      }
+      };
     } finally {
       setLoading(false);
-    }
+    };
   };
 
   const removeFile = (index, type) => {
@@ -197,7 +195,8 @@ export default function CreateForm() {
         ...prev,
         textFiles: prev.textFiles.filter((_, i) => i !== index)
       }));
-    }
+    };
+
     setFileNames(prev => prev.filter((_, i) => i !== index));
   };
 
@@ -279,4 +278,4 @@ export default function CreateForm() {
       </form>
     </div>
   );
-}
+};

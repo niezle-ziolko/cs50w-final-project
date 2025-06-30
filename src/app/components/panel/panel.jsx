@@ -138,6 +138,13 @@ export default function ClientPanel({ title }) {
                   }
                 }}>
                   <td>
+                    {/* Display AI watermark */}
+                    {book.ai && (
+                      <div>
+                
+                      </div>
+                    )}
+
                     {/* Display book picture */}
                     <img className="w-full md:w-50 h-full md:h-71" src={book.picture} alt={book.title} width="200" height="280" />
                     
