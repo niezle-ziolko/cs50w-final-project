@@ -6,8 +6,8 @@ import { useAuth } from "context/auth-context";
 import { CREATE_BOOK_MUTATION } from "client/mutations";
 import { decryptUser, fileToBase64 } from "../../utils";
 
-import AIIcon from "styles/icons/ai";
 import Loader from "components/loader";
+import AIButton from "components/buttons/ai-button";
 
 export default function CreateForm() {
   const { updateUser, user } = useAuth();
@@ -40,7 +40,7 @@ export default function CreateForm() {
           [isTextMode ? "textFiles" : "audio"]: [
             ...prev[isTextMode ? "textFiles" : "audio"],
             ...newFiles,
-          ],
+          ]
         }));
       };
     } else {
@@ -274,7 +274,7 @@ export default function CreateForm() {
           {loading ? <Loader color="black" /> : "Submit"}
         </button>
 
-        <AIIcon onClick={() => setIsTextMode((prev) => !prev)} />
+        <AIButton onClick={() => setIsTextMode((prev) => !prev)} />
       </form>
     </div>
   );

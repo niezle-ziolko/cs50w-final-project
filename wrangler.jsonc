@@ -42,7 +42,7 @@
         "NEXT_PUBLIC_JWT_SECRET": "epalxiPPOzirDSTzlxn2MA3NoOyhGgN0",
         "SECRET_KEY": "0x4AAAAAAA8Cypo9aDiDt4r2F23lLNjpoZs",
         "CRYPTO_KEY": "gEvMYq9ucDTpJBZxjDycysJTXMoGcNrn",
-        "CAMB_AI_KEY": "e87040df-3ada-431f-9383-e3c694f2a754",
+        "CAMB_AI_KEY": "ad68da1b-d374-4ef6-91c9-2ed605fae138",
 	    "NODE_VERSION": "24.1.0",
         "PNPM_VERSION": "10.12.4"
 	}

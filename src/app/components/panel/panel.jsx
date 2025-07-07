@@ -7,6 +7,7 @@ import { useAuth } from "context/auth-context";
 import { useAudio } from "context/audio-context";
 
 import Loader from "../loader";
+import AIIcon from "styles/icons/ai";
 import SearchBar from "../forms/search";
 import InfoButton from "../buttons/info-button";
 import LikeButton from "../buttons/like-button";
@@ -138,15 +139,23 @@ export default function ClientPanel({ title }) {
                   }
                 }}>
                   <td>
-                    {/* Display AI watermark */}
-                    {book.ai && (
-                      <div>
-                
-                      </div>
-                    )}
-
                     {/* Display book picture */}
                     <img className="w-full md:w-50 h-full md:h-71" src={book.picture} alt={book.title} width="200" height="280" />
+
+                    {/* Display AI watermark */}
+                    {book.ai && (
+                      <div className="absolute top-0 right-0">
+                        <div className="relative w-13 h-13">
+                          {/* Triangle as background */}
+                          <div className="absolute top-0 right-0 w-0 h-0 border-t-65 border-l-65 border-t-secondary border-l-transparent pointer-events-none" />
+    
+                          {/* Icon on top */}
+                          <div className="absolute top-0 right-0">
+                            <AIIcon />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     
                     {/* Display play icon or like button based on the title */}
                     {title === "Library" || title === "Liked books" ? (
