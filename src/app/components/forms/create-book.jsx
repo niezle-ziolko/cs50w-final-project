@@ -144,6 +144,7 @@ export default function CreateForm() {
       const token = data?.createBook?.data;
 
       if (!token) {
+        console.error("Server response:", data);
         throw new Error("No user data returned from server.");
       };
 
