@@ -68,171 +68,153 @@ export const resolvers = {
 
   Mutation: {
     createBook: async (_, { input }, context) => {
+  try {
+    const { db, env } = context;
+    const { title, description, username, imageBase64, audioFilesBase64 } = input;
+
+    if (!title?.trim()) throw new GraphQLError("Title is required.", { extensions: { code: "BAD_USER_INPUT" } });
+    if (!description?.trim()) throw new GraphQLError("Description is required.", { extensions: { code: "BAD_USER_INPUT" } });
+    if (!username?.trim()) throw new GraphQLError("Username is required.", { extensions: { code: "BAD_USER_INPUT" } });
+    if (!imageBase64?.trim()) throw new GraphQLError("Image is required.", { extensions: { code: "BAD_USER_INPUT" } });
+    if (!Array.isArray(audioFilesBase64) || audioFilesBase64.length === 0)
+      throw new GraphQLError("At least one audio file is required.", { extensions: { code: "BAD_USER_INPUT" } });
+
+    const userResult = await db.prepare("SELECT * FROM users WHERE username = ?").bind(username).first();
+    if (!userResult) throw new GraphQLError("User not found", { extensions: { code: "NOT_FOUND" } });
+
+    const existingBook = await db.prepare("SELECT id FROM books WHERE title = ?").bind(title.trim()).first();
+    if (existingBook) throw new GraphQLError("Title already exists", { extensions: { code: "BAD_REQUEST" } });
+
+    const bookId = uuidv4();
+    const dateCreated = new Date().toISOString();
+
+    // Upload image
+    let imageUrl = "";
+    try {
+      const cleanBase64 = imageBase64.split(",")[1];
+      const imageBinary = Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0));
+
+      const imageName = `${bookId}.webp`;
+      const imageKey = `images/books/${imageName}`;
+
+      await env.R2.put(imageKey, imageBinary);
+      imageUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${imageKey}`;
+      console.log("Image upload completed:", imageUrl);
+    } catch (error) {
+      console.error("Image upload failed:", error.message);
+    }
+
+    // Upload or generate audio
+    const fileUrls = [];
+    let isAiGenerated = false;
+
+    for (let i = 0; i < audioFilesBase64.length && i < 100; i++) {
+      const base64 = audioFilesBase64[i];
+      if (!base64?.trim()) continue;
+
       try {
-        const { db, env } = context;
-        const { title, description, username, imageBase64, audioFilesBase64 } = input;
+        const [meta, data] = base64.split(",");
+        const mimeType = meta.match(/data:(.*?);base64/)?.[1];
+        if (!mimeType || !data) continue;
 
-        if (!title?.trim()) {
-          throw new GraphQLError("Title is required.", { extensions: { code: "BAD_USER_INPUT" } });
-        };
+        const fileBuffer = Uint8Array.from(atob(data), c => c.charCodeAt(0));
 
-        if (!description?.trim()) {
-          throw new GraphQLError("Description is required.", { extensions: { code: "BAD_USER_INPUT" } });
-        };
+        let extension = "";
+        if (mimeType === "audio/mpeg") extension = "mp3";
+        else if (mimeType === "text/plain") extension = "txt";
+        else if (mimeType === "application/pdf") extension = "pdf";
+        else continue;
 
-        if (!username?.trim()) {
-          throw new GraphQLError("Username is required.", { extensions: { code: "BAD_USER_INPUT" } });
-        };
+        let finalAudioUrl = "";
 
-        if (!imageBase64?.trim()) {
-          throw new GraphQLError("Image is required.", { extensions: { code: "BAD_USER_INPUT" } });
-        };
-
-        if (!audioFilesBase64 || !Array.isArray(audioFilesBase64) || audioFilesBase64.length === 0) {
-          throw new GraphQLError("At least one audio file is required.", { extensions: { code: "BAD_USER_INPUT" } });
-        };
-
-        // Check user
-        const userResult = await db.prepare("SELECT * FROM users WHERE username = ?").bind(username).first();
-
-        if (!userResult) {
-          throw new GraphQLError("User not found", { extensions: { code: "NOT_FOUND" } });
-        };
-
-        // Check duplicate
-        const existingBook = await db.prepare("SELECT id FROM books WHERE title = ?").bind(title.trim()).first();
-
-        if (existingBook) {
-          throw new GraphQLError("Title already exists", { extensions: { code: "BAD_REQUEST" } });
-        };
-
-        // Generate a unique UUID
-        const bookId = uuidv4();
-        const dateCreated = new Date().toISOString();
-
-        // Upload image
-        let imageUrl = "";
-        try {
-          const cleanBase64 = imageBase64.split(",")[1]; // usuwa prefix data URI
-          const imageBinary = Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0));
-
-          const imageName = `${bookId}.webp`;
-          const imageKey = `images/books/${imageName}`;
-
-          await env.R2.put(imageKey, imageBinary);
-          imageUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${imageKey}`;
-          console.log("Image upload completed:", imageUrl);
-        } catch (error) {
-          console.error("Image upload failed:", error);
-        };
-
-        // Upload audio files
-        const fileUrls = [];
-        let isAiGenerated = false;
-
-        for (let i = 0; i < audioFilesBase64.length && i < 100; i++) {
-          const base64 = audioFilesBase64[i];
-
-          if (!base64?.trim()) continue;
-
+        if (extension === "txt" || extension === "pdf") {
           try {
-            const [meta, data] = base64.split(",");
-            const mimeType = meta.match(/data:(.*?);base64/)?.[1];
+            const cambUrl = await convertToMp3(fileBuffer, `input.${extension}`);
+            if (!cambUrl?.startsWith("http")) throw new Error("Invalid Camb.ai audio URL");
 
-            if (!mimeType || !data) {
-              console.warn(`Invalid base64 format at index ${i}`);
-              continue;
-            };
+            const audioRes = await fetch(cambUrl);
+            if (!audioRes.ok) {
+              const text = await audioRes.text();
+              throw new Error(`Failed to fetch Camb.ai audio: ${text}`);
+            }
 
-            const fileBuffer = Uint8Array.from(atob(data), c => c.charCodeAt(0));
-
-            let extension = "";
-            if (mimeType === "audio/mpeg") extension = "mp3";
-            else if (mimeType === "text/plain") extension = "txt";
-            else if (mimeType === "application/pdf") extension = "pdf";
-            else {
-              console.warn(`Unsupported MIME type at index ${i}: ${mimeType}`);
-              continue;
-            };
-
-            let finalAudioUrl = "";
-
-            if (extension === "txt" || extension === "pdf") {
-              // 👉 Processing by Camb.ai
-              const cambUrl = await convertToMp3(fileBuffer, `input.${extension}`);
-              const audioRes = await fetch(cambUrl);
-              const audioBinary = new Uint8Array(await audioRes.arrayBuffer());
-
-              const fileName = `${bookId}-${i + 1}.mp3`;
-              const fileKey = `file/books/${fileName}`;
-              await env.R2.put(fileKey, audioBinary);
-              finalAudioUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${fileKey}`;
-              isAiGenerated = true;
-            } else {
-              // 👉 Direct .mp3 audio
-              const fileName = `${bookId}-${i + 1}.mp3`;
-              const fileKey = `file/books/${fileName}`;
-              await env.R2.put(fileKey, fileBuffer);
-              finalAudioUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${fileKey}`;
-            };
-
-            fileUrls.push(finalAudioUrl);
-            console.log(`Uploaded/Generated audio ${i + 1}:`, finalAudioUrl);
+            const audioBinary = new Uint8Array(await audioRes.arrayBuffer());
+            const fileName = `${bookId}-${i + 1}.mp3`;
+            const fileKey = `file/books/${fileName}`;
+            await env.R2.put(fileKey, audioBinary);
+            finalAudioUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${fileKey}`;
+            isAiGenerated = true;
           } catch (err) {
-            console.error(`Audio file ${i + 1} processing failed:`, err);
-          };
-        };
+            console.error(`Audio file ${i + 1} processing failed (Camb.ai):`, err.message);
+            continue;
+          }
+        } else {
+          try {
+            const fileName = `${bookId}-${i + 1}.mp3`;
+            const fileKey = `file/books/${fileName}`;
+            await env.R2.put(fileKey, fileBuffer);
+            finalAudioUrl = `https://pub-99725015ac6548d2b4f311643799fa78.r2.dev/${fileKey}`;
+          } catch (err) {
+            console.error(`Audio file ${i + 1} upload failed:`, err.message);
+            continue;
+          }
+        }
 
-        if (fileUrls.length === 0) {
-          throw new GraphQLError("No valid audio files were processed", { extensions: { code: "BAD_USER_INPUT" } });
-        };
+        fileUrls.push(finalAudioUrl);
+        console.log(`Uploaded/Generated audio ${i + 1}:`, finalAudioUrl);
+      } catch (err) {
+        console.error(`Audio file ${i + 1} processing failed:`, err.message);
+      }
+    }
 
-        const fileUrlsString = fileUrls.join(",");
+    if (fileUrls.length === 0) {
+      throw new GraphQLError("No valid audio files were processed", { extensions: { code: "BAD_USER_INPUT" } });
+    }
 
-        // Save to database
-        try {
-          await db.prepare(`
-            INSERT INTO books (id, title, description, author, picture, file, date, ai)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          `).bind(bookId, title.trim(), description.trim(), username, imageUrl, fileUrlsString, dateCreated, isAiGenerated).run();
-        } catch (dbError) {
-          console.error("Database error:", dbError);
-          throw new GraphQLError(`Failed to save book to database: ${dbError.message}`, { extensions: { code: "INTERNAL_ERROR" } });
-        };
+    const fileUrlsString = fileUrls.join(",");
 
-        // Update user
-        try {
-          console.log("Updating user...");
-          const existingCreated = userResult.created || "";
-          const updatedCreated = existingCreated ? `${existingCreated}, ${bookId}` : bookId;
+    // Save to database
+    try {
+      await db.prepare(`
+        INSERT INTO books (id, title, description, author, picture, file, date, ai)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(bookId, title.trim(), description.trim(), username, imageUrl, fileUrlsString, dateCreated, isAiGenerated).run();
+    } catch (dbError) {
+      console.error("Database error:", dbError);
+      throw new GraphQLError(`Failed to save book to database: ${dbError.message}`, { extensions: { code: "INTERNAL_ERROR" } });
+    }
 
-          await db.prepare("UPDATE users SET created = ? WHERE id = ?").bind(updatedCreated, userResult.id).run();
+    // Update user
+    try {
+      console.log("Updating user...");
+      const existingCreated = userResult.created || "";
+      const updatedCreated = existingCreated ? `${existingCreated}, ${bookId}` : bookId;
 
-          const userData = {
-            id: userResult.id,
-            username: userResult.username,
-            email: userResult.email,
-            photo: userResult.photo,
-            created: updatedCreated,
-            currently: userResult.currently,
-            liked: userResult.liked,
-            expiresDate: new Date().toISOString()
-          };
+      await db.prepare("UPDATE users SET created = ? WHERE id = ?").bind(updatedCreated, userResult.id).run();
 
-          const token = await signJWT(userData);
-
-          return { data: token };
-        } catch (userError) {
-          console.error("Error updating user:", userError);
-          throw new GraphQLError(`Failed to update user: ${userError.message}`, { extensions: { code: "INTERNAL_ERROR" } });
-        };
-      } catch (error) {
-        console.error("CreateBook error:", error);
-        if (error instanceof GraphQLError) { throw error; };
-
-        throw new GraphQLError(error.message || "Unknown error occurred", { extensions: { code: "INTERNAL_ERROR" } });
+      const userData = {
+        id: userResult.id,
+        username: userResult.username,
+        email: userResult.email,
+        photo: userResult.photo,
+        created: updatedCreated,
+        currently: userResult.currently,
+        liked: userResult.liked,
+        expiresDate: new Date().toISOString(),
       };
-    },
+
+      const token = await signJWT(userData);
+      return { data: token };
+    } catch (userError) {
+      console.error("Error updating user:", userError);
+      throw new GraphQLError(`Failed to update user: ${userError.message}`, { extensions: { code: "INTERNAL_ERROR" } });
+    }
+  } catch (error) {
+    console.error("CreateBook error:", error);
+    if (error instanceof GraphQLError) throw error;
+    throw new GraphQLError(error.message || "Unknown error occurred", { extensions: { code: "INTERNAL_ERROR" } });
+  }
+},
 
     loginUser: async (_, { credentials }, context) => {
       try {
