@@ -121,6 +121,71 @@ cs50-final-project/
 └── wrangler.jsonc                 # A file containing settings for the Cloudflare Pages service such as environment variables.
 ```
 
+```
+  cs50w-final-project/
+  ├── .eslintrc.json
+  ├── .gitignore
+  ├── jsconfig.json
+  ├── LICENSE
+  ├── next.config.mjs
+  ├── open-next.config.ts
+  ├── package.json
+  ├── pnpm-lock.yaml
+  ├── postcss.config.mjs
+  ├── wrangler.jsonc                    # A file containing settings for the Cloudflare Workers service such as environment variables.
+  ├── .vscode/
+  │   └── settings.json
+  ├── database/
+  │   └── schema.sql
+  ├── public/                           # Public files
+  │   ├── _headers
+  │   ├── _redirects
+  │   ├── 66d472c0-880d-4b93-bc8a-ada91cbf997a.json
+  │   ├── 204c081a-5684-4858-a89b-876b4187f66b.json
+  │   ├── bc85dd48-c477-44f3-a7cb-57ee63b86e07.json
+  │   ├── de34672e-4cf1-4ac2-bb1b-d9caae7d140a.json
+  │   └── logo.svg
+  └── src/                              # Source files
+      ├── lib/                          # Folder with files that add additional features to the application
+      │   └── env.js                    # Script to load all environment variables in the application frontend
+      └── app/                          # Main application folder
+          ├── favicon.ico               # Favicon icon
+          ├── layout.js                 # Layout file
+          ├── not-found.js              # Not found page
+          ├── page.js                   # Main page
+          ├── utils.js                  # Utils frontend file
+          ├── api/                      # A folder to create a backend for the application.
+          │   ├── Sf19GHAdWc/
+          │   │   └── route.js
+          │   └── utils/
+          │       ├── headers.js
+          │       ├── resolvers.js
+          │       ├── schema.js
+          │       └── utils.js
+          ├── client/
+          │   ├── client.js
+          │   ├── mutation.js
+          │   └── query.js
+          ├── components/
+          │   ├── copy.jsx
+          │   ├── footer.jsx
+          │   ├── form.jsx
+          │   ├── header.jsx
+          │   ├── info.jsx
+          │   ├── loader.jsx
+          │   ├── message.jsx
+          │   └── buttons/
+          │        └── theme-button.jsx
+          ├── context/
+          │   └── theme-context.jsx
+          ├── created/
+          │   └── page.jsx
+          ├── notate/
+          │   └── page.jsx
+          └── notate/
+              └── page.jsx
+```
+
 ## ✅ Features Overview
 
 ### 🔐 User Authentication

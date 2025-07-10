@@ -40,13 +40,13 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!isLoading) {
       // If the user is not authenticated, redirect them to the login page
-      if (!user && ["/auth/my-account", "/auth/library", "/auth/my-books"].includes(pathname)) {
+      if (!user && ["/auth/my-account", "/auth/library", "/auth/my-books", "/auth/create-book"].includes(pathname)) {
         router.push("/auth/login");
       } 
       // If the user is not authenticated and trying to access a specific library page, redirect to login
       else if (!user && pathname.startsWith("/auth/library/")) {
         router.push("/auth/login");
-      } 
+      }
       // If the user is authenticated and trying to access the login or register pages, redirect to the user account page
       else if (user && ["/auth/login", "/auth/register"].includes(pathname)) {
         router.push("/auth/my-account");
