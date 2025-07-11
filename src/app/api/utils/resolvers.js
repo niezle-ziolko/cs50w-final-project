@@ -76,8 +76,7 @@ export const resolvers = {
         if (!description?.trim()) throw new GraphQLError("Description is required.", { extensions: { code: "BAD_USER_INPUT" } });
         if (!username?.trim()) throw new GraphQLError("Username is required.", { extensions: { code: "BAD_USER_INPUT" } });
         if (!imageBase64?.trim()) throw new GraphQLError("Image is required.", { extensions: { code: "BAD_USER_INPUT" } });
-        if (!Array.isArray(audioFilesBase64) || audioFilesBase64.length === 0)
-          throw new GraphQLError("At least one audio file is required.", { extensions: { code: "BAD_USER_INPUT" } });
+        if (!Array.isArray(audioFilesBase64) || audioFilesBase64.length === 0) throw new GraphQLError("At least one audio file is required.", { extensions: { code: "BAD_USER_INPUT" } });
 
         const userResult = await db.prepare("SELECT * FROM users WHERE username = ?").bind(username).first();
         if (!userResult) throw new GraphQLError("User not found", { extensions: { code: "NOT_FOUND" } });
@@ -102,7 +101,7 @@ export const resolvers = {
           console.log("Image upload completed:", imageUrl);
         } catch (error) {
           console.error("Image upload failed:", error.message);
-        }
+        };
 
         // Upload or generate audio
         const fileUrls = [];
@@ -136,7 +135,7 @@ export const resolvers = {
                 if (!audioRes.ok) {
                   const text = await audioRes.text();
                   throw new Error(`Failed to fetch Camb.ai audio: ${text}`);
-                }
+                };
 
                 const audioBinary = new Uint8Array(await audioRes.arrayBuffer());
                 const fileName = `${bookId}-${i + 1}.mp3`;
@@ -147,7 +146,7 @@ export const resolvers = {
               } catch (err) {
                 console.error(`Audio file ${i + 1} processing failed (Camb.ai):`, err.message);
                 continue;
-              }
+              };
             } else {
               try {
                 const fileName = `${bookId}-${i + 1}.mp3`;
@@ -157,19 +156,19 @@ export const resolvers = {
               } catch (err) {
                 console.error(`Audio file ${i + 1} upload failed:`, err.message);
                 continue;
-              }
-            }
+              };
+            };
 
             fileUrls.push(finalAudioUrl);
             console.log(`Uploaded/Generated audio ${i + 1}:`, finalAudioUrl);
           } catch (err) {
             console.error(`Audio file ${i + 1} processing failed:`, err.message);
-          }
-        }
+          };
+        };
 
         if (fileUrls.length === 0) {
           throw new GraphQLError("No valid audio files were processed", { extensions: { code: "BAD_USER_INPUT" } });
-        }
+        };
 
         const fileUrlsString = fileUrls.join(",");
 
@@ -182,7 +181,7 @@ export const resolvers = {
         } catch (dbError) {
           console.error("Database error:", dbError);
           throw new GraphQLError(`Failed to save book to database: ${dbError.message}`, { extensions: { code: "INTERNAL_ERROR" } });
-        }
+        };
 
         // Update user
         try {
@@ -208,12 +207,12 @@ export const resolvers = {
         } catch (userError) {
           console.error("Error updating user:", userError);
           throw new GraphQLError(`Failed to update user: ${userError.message}`, { extensions: { code: "INTERNAL_ERROR" } });
-        }
+        };
       } catch (error) {
         console.error("CreateBook error:", error);
         if (error instanceof GraphQLError) throw error;
         throw new GraphQLError(error.message || "Unknown error occurred", { extensions: { code: "INTERNAL_ERROR" } });
-      }
+      };
     },
 
     loginUser: async (_, { credentials }, context) => {

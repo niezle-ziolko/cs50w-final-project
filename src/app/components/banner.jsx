@@ -95,16 +95,16 @@ export default function Banner() {
           <div className="u17">
             {[
               {
-                src: "/f0bdce3a-4e60-4215-9f3e-25a3fbd479ee.webp",
-                title: "The Witcher - The Last Wish",
+                src: "/9c952f2e-dc15-4db0-b9c0-0782817b8f58.webp",
+                title: "The Sixth Dead",
               },
               {
-                src: "/3a9b1f84-d1e5-4c27-8d1f-72085a5a203f.webp",
-                title: "Harry Potter and the Sorcerer's Stone",
+                src: "/d74a758e-5c65-4b77-af84-3f1e27f939a9.webp",
+                title: "Star Protocol",
               },
               {
-                src: "/29a6d2ff-6c68-4899-99fc-1e3ea77940a1.webp",
-                title: "The Lord of the Rings - The Fellowship of the Ring",
+                src: "/6ffdb3d0-57fe-4008-9bbf-9798d2af71c6.webp",
+                title: "Touch of Control",
               },
             ].map((book, index) => (
               <div key={index} className="group relative overflow-hidden rounded-sm shadow-md focus:outline-none" tabIndex={0}>
