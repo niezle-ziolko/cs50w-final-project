@@ -1,21 +1,22 @@
 import { notFound } from "next/navigation";
 
+import { BOOK_QUERY } from "client/query";
 import AudioPlayer from "components/player";
+import { apolloClient } from "client/client";
 import BookPanel from "components/panel/book-panel";
 
 export default async function Page({ params }) {
   const { id } = await params;
 
   try {
-    const response = await fetch(`https://echoverse.wgwcompany.workers.dev/api/data/book?id=${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_BOOK_AUTH}`
-      }
+    const client = apolloClient(process.env.NEXT_PUBLIC_BOOK_AUTH);
+
+    const data = await client.query({
+      query: BOOK_QUERY,
+      variables: { id }
     });
 
-    const book = await response.json();
+    const book = data?.books;
 
     if (!book || !id) {
       notFound();

@@ -37,6 +37,8 @@
     ],
     "vars": {
         "SITE_KEY": "0x4AAAAAAA8CytbRsD_4tmim",
+        "NEXT_BOOK_AUTH": "7y68NwcH6STwp6YDTUKbU6ZUZs6B5FPe",
+        "NEXT_PUBLIC_BOOK_AUTH": "7y68NwcH6STwp6YDTUKbU6ZUZs6B5FPe",
         "NEXT_PUBLIC_SITE_KEY": "0x4AAAAAAA8CytbRsD_4tmim",
         "JWT_SECRET": "epalxiPPOzirDSTzlxn2MA3NoOyhGgN0",
         "NEXT_PUBLIC_JWT_SECRET": "epalxiPPOzirDSTzlxn2MA3NoOyhGgN0",

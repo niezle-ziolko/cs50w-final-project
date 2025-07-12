@@ -4,7 +4,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 const { env } = await getCloudflareContext({ async: true });
 
 // JWT signing/encryption key - should be in environment variables in production
-const getJWTSecret = () => {
+function getJWTSecret() {
   const secret = env.JWT_SECRET;
 
   if (!secret) {

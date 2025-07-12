@@ -6,9 +6,9 @@ export default function NotFound() {
           <div className="w-20 h-20 rounded-full bg-or-600 -z-1 ml-0 -mb-24 border-2">
             <div className="absolute w-6 h-3 rounded-(--spacing-hp) mt-1 ml-5 -rotate-20 bg-or-300" />
             <div className="absolute bg-transparent w-13 h-14 ml-[1.55rem] rounded-[45%] rotate-[140deg] border-4 border-transparent inset-shadow-[0_var(--spacing-o)_var(--color-or-700),0_var(--spacing-o)_0.06rem_0.06rem_var(--color-or-700)]" />
-            <div className="-top-19 -left-25 w-48 h-22 relative transform-[rotate(-29deg)] bg-[linear-gradient(to_bottom,var(--color-b-200),var(--color-b-200),var(--color-b-100),var(--color-b-100),var(--color-b-200))] [clip-path:polygon(50%_0%,_49%_100%,_52%_100%)]" />
+            <div className="-top-19 -left-25 w-48 h-22 relative transform-[rotate(-29deg)] bg-[linear-gradient(to_bottom,var(--color-b-200),var(--color-b-200),var(--color-b-200),var(--color-b-200),var(--color-b-200))] [clip-path:polygon(50%_0%,_49%_100%,_52%_100%)]" />
             <div className="u2 -top-40 -left-7" />
-            <div className="w-48 h-16 -top-40 -left-2 relative transform-[rotate(-8deg)] bg-[linear-gradient(to_bottom,var(--color-b-200),var(--color-b-200),var(--color-b-100),var(--color-b-100),var(--color-b-200))] [clip-path:polygon(47%_0%,_47%_0%,_34%_34%,_54%_25%,_32%_100%,_29%_96%,_49%_32%,_30%_38%)]" />
+            <div className="w-48 h-16 -top-40 -left-2 relative transform-[rotate(-8deg)] bg-[linear-gradient(to_bottom,var(--color-b-200),var(--color-b-200),var(--color-b-200),var(--color-b-200),var(--color-b-200))] [clip-path:polygon(47%_0%,_47%_0%,_34%_34%,_54%_25%,_32%_100%,_29%_96%,_49%_32%,_30%_38%)]" />
             <div className="u2 left-18 -top-56" />
             <div className="absolute -mt-37.5 ml-2 w-4 h-2 rounded-(--spacing-hp) -rotate-25 bg-or-300" />
           </div>

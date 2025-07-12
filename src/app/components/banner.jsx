@@ -1,8 +1,9 @@
 "use client";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
+import { blurPlaceholder } from "../utils";
 
 import calmData from "public/66d472c0-880d-4b93-bc8a-ada91cbf997a.json";
 import musicData from "public/204c081a-5684-4858-a89b-876b4187f66b.json";
@@ -13,11 +14,6 @@ const Lottie = dynamic(() => import("react-lottie"), { ssr: false });
 
 export default function Banner() {
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const defaultLottieOptions = (animationData) => ({
     loop: true,
@@ -27,8 +23,6 @@ export default function Banner() {
   });
 
   const size = 100;
-
-  if (!isClient) return null;
 
   return (
     <div className="min-h-screen">
@@ -109,10 +103,13 @@ export default function Banner() {
             ].map((book, index) => (
               <div key={index} className="group relative overflow-hidden rounded-sm shadow-md focus:outline-none" tabIndex={0}>
                 <Image
-                  src={book.src}
-                  alt={book.title}
                   width={600}
                   height={757}
+                  loading="lazy"
+                  src={book.src}
+                  alt={book.title}
+                  placeholder="blur"
+                  blurDataURL={blurPlaceholder}
                   className="h-auto w-full border-2 object-cover border-primary duration-300 transition-all group-hover:blur-xs group-focus:blur-xs group-active:blur-xs"
                 />
                 <div className="u1 p-4 absolute inset-0 opacity-0 duration-300 transition-all group-hover:opacity-100 group-focus:opacity-100 group-active:opacity-100">
@@ -159,9 +156,12 @@ export default function Banner() {
                 <Image
                   width={500}
                   height={500}
+                  loading="lazy"
                   src={review.src}
-                  alt={`Avatar of ${review.author}`}
+                  placeholder="blur"
+                  blurDataURL={blurPlaceholder}
                   className="h-20 w-20 rounded-sm"
+                  alt={`Avatar of ${review.author}`}
                 />
                 <div className="w-full px-2">
                   <p className="italic mb-1">{review.comment}</p>

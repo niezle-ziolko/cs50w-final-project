@@ -1,10 +1,12 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useState, useCallback } from "react";
 
-import { BOOK_QUERY, BOOKS_QUERY } from "client/query";
 import { apolloClient } from "client/client";
+import { blurPlaceholder } from "../../utils";
 import { useAuth } from "context/auth-context";
 import { useAudio } from "context/audio-context";
+import { BOOK_QUERY, BOOKS_QUERY } from "client/query";
 
 import Loader from "../loader";
 import AIIcon from "styles/icons/ai";
@@ -140,7 +142,16 @@ export default function ClientPanel({ title }) {
                 }}>
                   <td>
                     {/* Display book picture */}
-                    <img className="w-full md:w-50 h-full md:h-71" src={book.picture} alt={book.title} width="200" height="280" />
+                    <Image
+                      width="200"
+                      height="280"
+                      loading="lazy"
+                      alt={book.title}
+                      src={book.picture}
+                      placeholder="blur"
+                      blurDataURL={blurPlaceholder}
+                      className="w-full md:w-50 h-full md:h-71"
+                    />
 
                     {/* Display AI watermark */}
                     {book.ai && (

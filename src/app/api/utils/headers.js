@@ -1,19 +1,9 @@
 import { GraphQLError } from "graphql";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 import { verifyJWT } from "./utils";
 
-export function bearerHeaders(request, authToken) {
-  const authorizationHeader = request.headers.get("Authorization");
-
-  if (!authorizationHeader || !authorizationHeader.startsWith(`Bearer ${authToken}`)) {
-    return new Response(JSON.stringify({ operation: false, error: "No authorization." }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" }
-    });
-  };
-
-  return null;
-};
+const { env } = await getCloudflareContext({ async: true });
 
 export async function bearerHeader(auth, clientIps, env){
   // Extract token from Bearer format
@@ -65,6 +55,10 @@ export async function authenticateHeader(authHeader) {
   
   if (!token) {
     throw new GraphQLError("Invalid authorization header format", { extensions: { code: "UNAUTHENTICATED" } });
+  };
+
+  if (token === env.NEXT_BOOK_AUTH) {
+    return null;
   };
 
   try {

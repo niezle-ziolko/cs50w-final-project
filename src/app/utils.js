@@ -35,3 +35,5 @@ export const fileToBase64 = (file) => {
     reader.onerror = error => reject(error);   
   });
 };
+
+export const blurPlaceholder = "data:image/webp;base64,UklGRiIAAABXRUJQVlA4ICwAAAAwAQCdASoEAAQAAVAfCWkAQU5JTQAA";
